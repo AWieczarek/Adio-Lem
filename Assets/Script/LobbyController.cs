@@ -55,7 +55,7 @@ public class LobbyController : MonoSingleton<LobbyController>
 
     public void OnStartLobbyButton()
     {
-        NetworkSceneManager.SwitchScene("GameScene");
+        NetworkSceneManager.SwitchScene("GamePhone");
     }
 
     public void OnLobbySubmitNameChange()
