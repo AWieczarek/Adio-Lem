@@ -7,7 +7,7 @@ using UnityEngine;
 public class PlayerController : NetworkBehaviour
 {
 
-    private NetworkVariableString playerName = new NetworkVariableString(new NetworkVariableSettings
+    public NetworkVariableString playerName = new NetworkVariableString(new NetworkVariableSettings
     {
         WritePermission = NetworkVariablePermission.OwnerOnly,
         ReadPermission = NetworkVariablePermission.Everyone
@@ -43,23 +43,13 @@ public class PlayerController : NetworkBehaviour
         UnRegisterEvents();
     }
 
-    public void CreateGameManager()
-    {
-        if (IsServer)
-        {
-            GameObject go = Instantiate(GameController.Instance.gameManagerPrefab);
-            go.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
-        }
-    }
-
-
     public void ChangeName(string newName)
     {
         if (IsOwner)
             playerName.Value = newName;
 
         playerNameLabel.text = playerName.Value;
-    }
+    } 
 
     private void RegisterEvents()
     {
@@ -76,4 +66,56 @@ public class PlayerController : NetworkBehaviour
         playerNameLabel.text = playerName.Value;
     }
 
+    [ServerRpc]
+    private void PlayServerRpc()
+    {
+        GameController.Instance.exe.OnPlayMedia();
+    }
+
+    public void Play()
+    {
+        if (!IsOwner) { return; }
+        PlayServerRpc();
+        GameController.Instance.exe.OnPlayMedia();
+    }
+
+    [ServerRpc]
+    private void PauseServerRpc()
+    {
+        GameController.Instance.exe.OnPauseMedia();
+    }
+
+    public void Pause()
+    {
+        if (!IsOwner) { return; }
+        PauseServerRpc();
+        GameController.Instance.exe.OnPauseMedia();
+    }
+
+
+    [ServerRpc]
+    private void NextServerRpc()
+    {
+        GameController.Instance.exe.OnNextMedia();
+    }
+
+    public void Next()
+    {
+        if (!IsOwner) { return; }
+        NextServerRpc();
+        GameController.Instance.exe.OnNextMedia();
+    }
+
+    [ServerRpc]
+    private void PrevServerRpc()
+    {
+        GameController.Instance.exe.OnPauseMedia();
+    }
+
+    public void Prev()
+    {
+        if (!IsOwner) { return; }
+        PrevServerRpc();
+        GameController.Instance.exe.OnPreviousMedia();
+    }
 }

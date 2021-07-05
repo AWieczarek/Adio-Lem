@@ -10,6 +10,8 @@ using UnityEngine;
 using UnityEngine.UI;
 public class SpotifyController : SpotifyUIBase
 {
+    [SerializeField] private GameObject m_connectCanvas = null;
+    [SerializeField] private GameObject m_connectingSpinner = null;
     [SerializeField] private Button m_connectBtn = null;
     [SerializeField] private TextMeshProUGUI m_artistText = null;
     [SerializeField] private TextMeshProUGUI m_trackText = null;
@@ -26,6 +28,21 @@ public class SpotifyController : SpotifyUIBase
     [SerializeField] private Spotify4Unity.Enums.Resolution m_albumArtResolution = Spotify4Unity.Enums.Resolution.Original;
     [SerializeField] private Color m_errorColor = new Color(1f, 0f, 0f, 0.5f);
 
+    public void OnConnect()
+    {
+        if (!SpotifyService.IsConnected)
+        {
+            m_connectCanvas.SetActive(false);
+            m_connectingSpinner.SetActive(true);
+
+            bool didAttempt = SpotifyService.Connect();
+            if (!didAttempt)
+            {
+                m_connectCanvas.SetActive(true);
+                m_connectingSpinner.SetActive(false);
+            }
+        }
+    }
 
     public async void OnNextMedia()
     {
@@ -45,6 +62,16 @@ public class SpotifyController : SpotifyUIBase
     public async void OnPlayMedia()
     {
         await SpotifyService.PlayAsync();
+    }
+
+    protected override void OnConnectingChanged(ConnectingChanged e)
+    {
+        base.OnConnectingChanged(e);
+
+        // Enable Connect Canvas when NOT connecting and NOT connected
+        m_connectCanvas.SetActive(!e.IsConnecting && !SpotifyService.IsConnected);
+        // Enable Spinner when connecting and NOT connected
+        m_connectingSpinner.SetActive(e.IsConnecting && !SpotifyService.IsConnected);
     }
 
     protected override void OnPlayStatusChanged(PlayStatusChanged e)
