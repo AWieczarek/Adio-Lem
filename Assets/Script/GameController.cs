@@ -4,13 +4,19 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameController : MonoSingleton<GameController>
 {
+    [SerializeField] private Animator animator;
     public SpotifyController exe;
     public TextMeshProUGUI playerNameLabel = null;
     public TextMeshProUGUI playerPointsLabel = null;
     public TextMeshProUGUI firstPlayerNameLabel = null;
+
+    public Image timerBar;
+    public float maxTimeOnTimer = 10f;
+    float timeLeft;
 
     private void Start()
     {
@@ -115,6 +121,40 @@ public class GameController : MonoSingleton<GameController>
                 player.SelectFirstPlayer();
         }
         exe.OnPauseMedia();
+        OnTurnOnTimer();
+    }
+
+    public void OnSpotifyPanelButton()
+    {
+        animator.SetTrigger("OpenSpotify");
+    }
+
+    public void OnBackToGameButton()
+    {
+        animator.SetTrigger("OpenGame");
+
+    }
+
+    public void OnYesNoButton()
+    {
+        animator.SetTrigger("OpenYesNo");
+
+    }
+
+    public void OnTurnOnTimer()
+    {
+        animator.SetTrigger("OpenTimer");
+        timeLeft = maxTimeOnTimer;
+        Invoke("OnYesNoButton", 10f);
+    }
+
+    private void Update()
+    {
+        if(timeLeft > 0)
+        {
+            timeLeft -= Time.deltaTime;
+            timerBar.fillAmount = timeLeft / maxTimeOnTimer;
+        }
     }
 
 }
