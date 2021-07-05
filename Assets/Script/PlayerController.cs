@@ -13,6 +13,12 @@ public class PlayerController : NetworkBehaviour
         ReadPermission = NetworkVariablePermission.Everyone
     });
 
+    public NetworkVariableInt playerPoints = new NetworkVariableInt(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.OwnerOnly,
+        ReadPermission = NetworkVariablePermission.Everyone
+    });
+
 
     private GameObject myPlayerListItem;
     private TextMeshProUGUI playerNameLabel;
@@ -117,5 +123,29 @@ public class PlayerController : NetworkBehaviour
         if (!IsOwner) { return; }
         PrevServerRpc();
         GameController.Instance.exe.OnPreviousMedia();
+    }
+
+    public void SelectFirstPlayer()
+    {
+        if (!IsOwner) { return; }
+        //if (GameController.Instance.firstPlayerNameLabel.text != "") { return; }
+        SelectFirstPlayerServerRpc();
+        Debug.Log(playerName.Value);
+        GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
+    }
+
+    [ServerRpc]
+    private void SelectFirstPlayerServerRpc()
+    {
+        SelectFirstPlayerClientRpc();
+        GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
+    }
+
+    [ClientRpc]
+    private void SelectFirstPlayerClientRpc()
+    {
+        if (IsOwner) { return; }
+        Debug.Log(playerName.Value);
+        GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
     }
 }

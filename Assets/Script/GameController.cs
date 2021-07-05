@@ -8,7 +8,9 @@ using UnityEngine;
 public class GameController : MonoSingleton<GameController>
 {
     public SpotifyController exe;
-    public TextMeshProUGUI playerNameLabel;
+    public TextMeshProUGUI playerNameLabel = null;
+    public TextMeshProUGUI playerPointsLabel = null;
+    public TextMeshProUGUI firstPlayerNameLabel = null;
 
     private void Start()
     {
@@ -71,6 +73,48 @@ public class GameController : MonoSingleton<GameController>
 
             }
         }
+    }
+
+    public void addPlayerPoints(int points)
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        {
+            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
+            if (player)
+            {
+                if (player.IsOwner)
+                {
+                    player.playerPoints.Value += points;
+                }
+            }
+        }
+        setPlayerPoints();
+    }
+
+    public void setPlayerPoints()
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        {
+            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
+            if (player)
+            {
+                if (player.IsOwner)
+                {
+                    playerPointsLabel.text = player.playerPoints.Value.ToString();
+                }
+            }
+        }
+    }
+
+    public void OnRaiseButtonClick()
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        {
+            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
+            if (player)
+                player.SelectFirstPlayer();
+        }
+        exe.OnPauseMedia();
     }
 
 }
