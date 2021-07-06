@@ -19,6 +19,11 @@ public class PlayerController : NetworkBehaviour
         ReadPermission = NetworkVariablePermission.Everyone
     });
 
+    public NetworkVariableInt playerTrigger = new NetworkVariableInt(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.OwnerOnly,
+        ReadPermission = NetworkVariablePermission.Everyone
+    });
 
     private GameObject myPlayerListItem;
     private TextMeshProUGUI playerNameLabel;
@@ -47,6 +52,15 @@ public class PlayerController : NetworkBehaviour
     {
         Destroy(myPlayerListItem);
         UnRegisterEvents();
+    }
+
+    public void CreateGameManager()
+    {
+        if (IsServer)
+        {
+            GameObject go = Instantiate(GameController.Instance.gameManagerPrefab);
+            go.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
+        }
     }
 
     public void ChangeName(string newName)

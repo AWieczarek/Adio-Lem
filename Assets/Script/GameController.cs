@@ -8,6 +8,9 @@ using UnityEngine.UI;
 
 public class GameController : MonoSingleton<GameController>
 {
+    [SerializeField] public GameObject gameManagerPrefab;
+    [SerializeField] public GameObject playerPrefab;
+    [SerializeField] public Transform playerListContainer;
     [SerializeField] private Animator animator;
     public SpotifyController exe;
     public TextMeshProUGUI playerNameLabel = null;
@@ -20,6 +23,14 @@ public class GameController : MonoSingleton<GameController>
 
     private void Start()
     {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.ServerClientId, out var networkedClient))
+        {
+            var player = networkedClient.PlayerObject.GetComponent<PlayerController>();
+            if (player)
+            {
+                player.CreateGameManager();
+            }
+        }
         setName();
     }
 
@@ -121,7 +132,7 @@ public class GameController : MonoSingleton<GameController>
                 player.SelectFirstPlayer();
         }
         exe.OnPauseMedia();
-        OnTurnOnTimer();
+        Invoke("OnTurnOnTimer", 2f);
     }
 
     public void OnSpotifyPanelButton()
@@ -157,4 +168,33 @@ public class GameController : MonoSingleton<GameController>
         }
     }
 
+    public void White()
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        {
+            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
+            if (player)
+                player.playerTrigger.Value = 0;
+        }
+    }
+
+    public void Red()
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        {
+            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
+            if (player)
+                player.playerTrigger.Value = 1;
+        }
+    }
+
+    public void Green()
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        {
+            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
+            if (player)
+                player.playerTrigger.Value = 2;
+        }
+    }
 }
