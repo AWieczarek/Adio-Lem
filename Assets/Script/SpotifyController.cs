@@ -12,16 +12,19 @@ public class SpotifyController : SpotifyUIBase
 {
     [SerializeField] private GameObject m_connectCanvas = null;
     [SerializeField] private GameObject m_connectingSpinner = null;
-    [SerializeField] private Button m_connectBtn = null;
-    [SerializeField] private TextMeshProUGUI m_artistText = null;
+
     [SerializeField] private TextMeshProUGUI m_trackText = null;
     [SerializeField] private TextMeshProUGUI m_albumText = null;
-    [SerializeField] private Button m_previousBtn = null;
-    [SerializeField] private Button m_nextBtn = null;
+
+    [SerializeField] private TextMeshProUGUI m_trackText1 = null;
+    [SerializeField] private TextMeshProUGUI m_albumText1 = null;
+
     [SerializeField] private Button m_playBtn = null;
     [SerializeField] private Button m_pauseBtn = null;
+
     [SerializeField] private Image m_albumArt = null;
-    [SerializeField] private Sprite[] m_shuffleSprites = null;
+    [SerializeField] private Image m_albumArt1 = null;
+
     [SerializeField] private Sprite AdvertSprite = null;
     [SerializeField] private Button m_shuffleBtn = null;
 
@@ -95,8 +98,7 @@ public class SpotifyController : SpotifyUIBase
         {
             // Load the Album Art for the new Track
             LoadAlbumArt(e.NewTrack, m_albumArtResolution);
-            SetTrackInfo(e.NewTrack.Title, e.NewTrack.Album, String.Join(", ", e.NewTrack.Artists.Select(x => x.Name)));
-
+            SetTrackInfo(e.NewTrack.Title, String.Join(", ", e.NewTrack.Artists.Select(x => x.Name)), e.NewTrack.Album);
         }
     }
 
@@ -118,6 +120,7 @@ public class SpotifyController : SpotifyUIBase
         if (m_albumArt != null)
         {
             m_albumArt.sprite = s;
+            m_albumArt1.sprite = s;
         }
     }
 
@@ -174,14 +177,18 @@ public class SpotifyController : SpotifyUIBase
 
     private void SetTrackInfo(string track, string artist, string album)
     {
-        if (m_artistText != null)
-            m_artistText.text = artist;
-
         if (m_trackText != null)
-            m_trackText.text = track;
+        {
+            m_trackText.text = artist + " - " + track;
+            m_trackText1.text = artist + " - " + track;
+        }
+            
 
         if (m_albumText != null)
+        {
             m_albumText.text = album;
+            m_albumText1.text = album;
+        }
     }
 
     private void OnDisconnect()

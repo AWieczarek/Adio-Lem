@@ -18,7 +18,7 @@ public class GameController : MonoSingleton<GameController>
     public TextMeshProUGUI firstPlayerNameLabel = null;
 
     public Image timerBar;
-    public float maxTimeOnTimer = 10f;
+    public float maxTimeOnTimer = 5f;
     float timeLeft;
 
     private void Start()
@@ -31,7 +31,10 @@ public class GameController : MonoSingleton<GameController>
                 player.CreateGameManager();
             }
         }
+        GameObject go = Instantiate(GameController.Instance.gameManagerPrefab);
+        go.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
         setName();
+        OnPlayButton();
     }
 
     public void OnPlayButton()
@@ -132,7 +135,6 @@ public class GameController : MonoSingleton<GameController>
                 player.SelectFirstPlayer();
         }
         exe.OnPauseMedia();
-        Invoke("OnTurnOnTimer", 2f);
     }
 
     public void OnSpotifyPanelButton()
@@ -143,20 +145,41 @@ public class GameController : MonoSingleton<GameController>
     public void OnBackToGameButton()
     {
         animator.SetTrigger("OpenGame");
-
     }
 
     public void OnYesNoButton()
     {
         animator.SetTrigger("OpenYesNo");
+    }
+    public void OnRecentSongButton()
+    {
+        animator.SetTrigger("OpenRecentSong");
+        Invoke("OnYesNoButton", 3f);
+    }
 
+    public void OnRecentSongServer()
+    {
+        animator.SetTrigger("OpenRecentSong");
+        Invoke("OnVoteListButton", 3f);
+    }
+
+    public void OnVoteListButton()
+    {
+        animator.SetTrigger("OpenVote");
     }
 
     public void OnTurnOnTimer()
     {
         animator.SetTrigger("OpenTimer");
         timeLeft = maxTimeOnTimer;
-        Invoke("OnYesNoButton", 10f);
+        Invoke("OnRecentSongButton", 5f);
+    }
+
+    public void OnTurnOnTimerServer()
+    {
+        animator.SetTrigger("OpenTimer");
+        timeLeft = maxTimeOnTimer;
+        Invoke("OnRecentSongServer", 5f);
     }
 
     private void Update()
@@ -168,33 +191,53 @@ public class GameController : MonoSingleton<GameController>
         }
     }
 
-    public void White()
+    public void SetNeutralTrigger()
     {
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
         {
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
+            {
                 player.playerTrigger.Value = 0;
+            }
         }
     }
 
-    public void Red()
+    public void SetRedTrigger()
     {
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
         {
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
+            {
                 player.playerTrigger.Value = 1;
+                OnVoteListButton();
+            }
         }
     }
 
-    public void Green()
+    public void SetGreenTrigger()
     {
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
         {
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
+            {
                 player.playerTrigger.Value = 2;
+                OnVoteListButton();
+            }
+        }
+    }
+
+    public void GoToNextRound()
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        {
+            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
+            if (player)
+            {
+                player.GoToNextRound();
+            }
         }
     }
 }

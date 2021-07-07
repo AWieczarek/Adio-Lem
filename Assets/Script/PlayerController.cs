@@ -142,10 +142,10 @@ public class PlayerController : NetworkBehaviour
     public void SelectFirstPlayer()
     {
         if (!IsOwner) { return; }
-        //if (GameController.Instance.firstPlayerNameLabel.text != "") { return; }
+        if (GameController.Instance.firstPlayerNameLabel.text != "") { return; }
         SelectFirstPlayerServerRpc();
-        Debug.Log(playerName.Value);
         GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
+        Invoke("OnTurnOnTimer", 1f);
     }
 
     [ServerRpc]
@@ -153,13 +153,98 @@ public class PlayerController : NetworkBehaviour
     {
         SelectFirstPlayerClientRpc();
         GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
+        Invoke("OnTurnOnTimerServer", 1f);
     }
 
     [ClientRpc]
     private void SelectFirstPlayerClientRpc()
     {
         if (IsOwner) { return; }
-        Debug.Log(playerName.Value);
         GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
+        Invoke("OnTurnOnTimer", 1f);
+    }
+
+    private void OnTurnOnTimer()
+    {
+        GameController.Instance.OnTurnOnTimer();
+        GameController.Instance.firstPlayerNameLabel.text = "";
+    }
+    private void OnTurnOnTimerServer()
+    {
+        GameController.Instance.OnTurnOnTimerServer();
+        GameController.Instance.firstPlayerNameLabel.text = "";
+    }
+    public void OpenRecentSong()
+    {
+        if (!IsOwner) { return; }
+        OpenRecentSongServerRpc();
+        GameController.Instance.OnRecentSongButton();
+    }
+
+    [ServerRpc]
+    private void OpenRecentSongServerRpc()
+    {
+        OpenRecentSongClientRpc();
+        GameController.Instance.OnRecentSongButton();
+    }
+
+    [ClientRpc]
+    private void OpenRecentSongClientRpc()
+    {
+        if (IsOwner) { return; }
+        GameController.Instance.OnRecentSongButton();
+    }
+
+
+    public void GoToNextRound()
+    {
+        if (!IsOwner) { return; }
+        GoToNextRoundServerRpc();
+        GameController.Instance.exe.OnNextMedia();
+        GameController.Instance.exe.OnPlayMedia();
+        GameController.Instance.maxTimeOnTimer = 5f;
+        GameController.Instance.OnBackToGameButton();
+    }
+
+    [ServerRpc]
+    private void GoToNextRoundServerRpc()
+    {
+        GoToNextRoundClientRpc();
+        GameController.Instance.exe.OnNextMedia();
+        GameController.Instance.exe.OnPlayMedia();
+        GameController.Instance.maxTimeOnTimer = 5f;
+        GameController.Instance.OnBackToGameButton();
+    }
+
+    [ClientRpc]
+    private void GoToNextRoundClientRpc()
+    {
+        if (IsOwner) { return; }
+        GameController.Instance.exe.OnNextMedia();
+        GameController.Instance.exe.OnPlayMedia();
+        GameController.Instance.maxTimeOnTimer = 5f;
+        GameController.Instance.OnBackToGameButton();
+    }
+
+
+    public void ResetTriggers()
+    {
+        if (!IsOwner) { return; }
+        ResetTriggersServerRpc();
+        GameController.Instance.SetNeutralTrigger();
+    }
+
+    [ServerRpc]
+    private void ResetTriggersServerRpc()
+    {
+        ResetTriggersClientRpc();
+        GameController.Instance.SetNeutralTrigger();
+    }
+
+    [ClientRpc]
+    private void ResetTriggersClientRpc()
+    {
+        if (IsOwner) { return; }
+        GameController.Instance.SetNeutralTrigger();
     }
 }
