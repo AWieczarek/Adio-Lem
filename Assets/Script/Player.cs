@@ -24,6 +24,7 @@ public class Player : NetworkBehaviour
             owner = networkedClient.PlayerObject.GetComponent<PlayerController>();
             playerNameLabel.text = owner.playerName.Value;
             triger = owner.playerTrigger.Value;
+            SetName(owner.playerName.Value);
         }
         else
         {
@@ -97,4 +98,28 @@ public class Player : NetworkBehaviour
             red.SetActive(false);
         }
     }
+
+
+
+    public void SetName(string newValue)
+    {
+        if (!IsOwner) { return; }
+        SetNameServerRpc(newValue);
+        playerNameLabel.text = newValue;
+    }
+
+    [ServerRpc]
+    private void SetNameServerRpc(string newValue)
+    {
+        SetNameClientRpc(newValue);
+        playerNameLabel.text = newValue;
+    }
+
+    [ClientRpc]
+    private void SetNameClientRpc(string newValue)
+    {
+        if (IsOwner) { return; }
+        playerNameLabel.text = newValue;
+    }
+
 }

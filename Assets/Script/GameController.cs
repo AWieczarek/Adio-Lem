@@ -11,7 +11,7 @@ public class GameController : MonoSingleton<GameController>
     [SerializeField] public GameObject gameManagerPrefab;
     [SerializeField] public GameObject playerPrefab;
     [SerializeField] public Transform playerListContainer;
-    [SerializeField] private Animator animator;
+    [SerializeField] public Animator animator;
     public SpotifyController exe;
     public TextMeshProUGUI playerNameLabel = null;
     public TextMeshProUGUI playerPointsLabel = null;
@@ -20,6 +20,13 @@ public class GameController : MonoSingleton<GameController>
     public Image timerBar;
     public float maxTimeOnTimer = 5f;
     float timeLeft;
+
+    public ulong firstPlayerId;
+    public GameObject GoToNextRoundButton;
+
+    public int voteCounter = 0;
+    public int positiveVoteCounter = 0;
+    public int players = 0;
 
     private void Start()
     {
@@ -31,10 +38,14 @@ public class GameController : MonoSingleton<GameController>
                 player.CreateGameManager();
             }
         }
-        GameObject go = Instantiate(GameController.Instance.gameManagerPrefab);
-        go.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
         setName();
         OnPlayButton();
+        if(NetworkManager.Singleton.IsServer)
+        {
+            GameObject go = Instantiate(GameController.Instance.gameManagerPrefab);
+            go.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
+        }
+        IncreasePlayerCouter();
     }
 
     public void OnPlayButton()
@@ -95,33 +106,14 @@ public class GameController : MonoSingleton<GameController>
         }
     }
 
-    public void addPlayerPoints(int points)
+    public void IncreasePlayerCouter()
     {
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
         {
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
             {
-                if (player.IsOwner)
-                {
-                    player.playerPoints.Value += points;
-                }
-            }
-        }
-        setPlayerPoints();
-    }
-
-    public void setPlayerPoints()
-    {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
-        {
-            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
-            if (player)
-            {
-                if (player.IsOwner)
-                {
-                    playerPointsLabel.text = player.playerPoints.Value.ToString();
-                }
+                player.IncreasePlayerCouter();
             }
         }
     }
@@ -132,7 +124,9 @@ public class GameController : MonoSingleton<GameController>
         {
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
-                player.SelectFirstPlayer();
+            {
+                player.SelectFirstPlayer(networkClient.ClientId);
+            }
         }
         exe.OnPauseMedia();
     }
@@ -211,6 +205,7 @@ public class GameController : MonoSingleton<GameController>
             if (player)
             {
                 player.playerTrigger.Value = 1;
+                player.IncreaseVoteCounter();
                 OnVoteListButton();
             }
         }
@@ -224,6 +219,8 @@ public class GameController : MonoSingleton<GameController>
             if (player)
             {
                 player.playerTrigger.Value = 2;
+                player.IncreaseVoteCounter();
+                player.IncreasePositiveVoteCounter();
                 OnVoteListButton();
             }
         }

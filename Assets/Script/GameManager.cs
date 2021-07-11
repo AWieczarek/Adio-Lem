@@ -1,5 +1,7 @@
 using MLAPI;
 using MLAPI.Connection;
+using MLAPI.Messaging;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -8,8 +10,7 @@ using UnityEngine;
 public class GameManager : NetworkBehaviour
 {
     private GameObject myPlayerListItem;
-    private int positiveVoteCounter = 0;
-    private int voteCounter = 0;
+    int x;
 
     public override void NetworkStart()
     {
@@ -23,24 +24,36 @@ public class GameManager : NetworkBehaviour
         {
             PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
             myPlayerListItem = Instantiate(GameController.Instance.playerPrefab, Vector3.zero, Quaternion.identity);
+            myPlayerListItem.name = pc.playerName.Value;
             myPlayerListItem.GetComponent<NetworkObject>().SpawnWithOwnership(nc.Key);
         }
     }
 
     public void CheckAllPlayersTrigger()
     {
-        voteCounter = 0;
-        positiveVoteCounter = 0;
+        if (GameController.Instance.voteCounter == GameController.Instance.players)
+        {
+            if (GameController.Instance.positiveVoteCounter >= Math.Round((double)(GameController.Instance.voteCounter / 2)))
+            {
+                AddPoints();
+                GoToNextRound();
+            }
+            else
+            {
+                if (NetworkManager.Singleton.LocalClientId == GameController.Instance.firstPlayerId)
+                    GameController.Instance.animator.SetTrigger("OpenDebil");
+                Invoke("GoToNextRound", 1f);
+            }
+            ResetAllTriggers();
+        }
+    }
+
+    private void AddPoints()
+    {
         foreach (KeyValuePair<ulong, NetworkClient> nc in NetworkManager.Singleton.ConnectedClients)
         {
             PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
-            if (pc.playerTrigger.Value == 2) positiveVoteCounter += 1;
-            if (pc.playerTrigger.Value != 0) voteCounter += 1;
-        }
-        if (voteCounter == NetworkManager.Singleton.ConnectedClients.Count)
-        {
-            GameController.Instance.GoToNextRound();
-            ResetAllTriggers();
+            pc.AddPosints();
         }
     }
 
@@ -50,6 +63,15 @@ public class GameManager : NetworkBehaviour
         {
             PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
             pc.ResetTriggers();
+        }
+    }
+
+    public void GoToNextRound()
+    {
+        foreach (KeyValuePair<ulong, NetworkClient> nc in NetworkManager.Singleton.ConnectedClients)
+        {
+            PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
+            pc.GoToNextRound();
         }
     }
 
