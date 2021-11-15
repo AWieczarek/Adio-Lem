@@ -3613,7 +3613,7 @@ MonoBehaviour:
   MessageBufferSize: 5120
   MaxConnections: 100
   MaxSentMessageQueueSize: 128
-  ConnectAddress: 192.168.1.14
+  ConnectAddress: 127.0.0.1
   ConnectPort: 7788
   ServerListenPort: 7788
   ServerWebsocketListenPort: 8887
