@@ -152,6 +152,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (!IsOwner) { return; }
         if (GameController.Instance.firstPlayerNameLabel.text != "") { return; }
+        GameController.Instance.exe.OnPauseMedia();
         SelectFirstPlayerServerRpc(id);
         GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
         GameController.Instance.firstPlayerId = id;
@@ -164,6 +165,7 @@ public class PlayerController : NetworkBehaviour
     private void SelectFirstPlayerServerRpc(ulong id)
     {
         SelectFirstPlayerClientRpc(id);
+        GameController.Instance.exe.OnPauseMedia();
         GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
         GameController.Instance.firstPlayerId = id;
         if (NetworkManager.Singleton.LocalClientId != id)
@@ -175,6 +177,7 @@ public class PlayerController : NetworkBehaviour
     private void SelectFirstPlayerClientRpc(ulong id)
     {
         if (IsOwner) { return; }
+        GameController.Instance.exe.OnPauseMedia();
         GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
         GameController.Instance.firstPlayerId = id;
         if (NetworkManager.Singleton.LocalClientId != id)
