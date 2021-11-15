@@ -13,6 +13,5 @@ Party game created in Unity, where you have to guess the right song faster than 
 - Now everybody else click yes or no to confirm the answer
 - Chceck points and go to next round
 
-<img src="/Images/ad5.PNG" width="20%" height="auto" /> <img src="/Images/ad2.PNG" width="20%" height="auto" /> <img src="/Images/ad3.PNG" width="20%" height="auto" />
+<img src="/Images/ad1.PNG" width="20%" height="auto" /> <img src="/Images/ad2.PNG" width="20%" height="auto" /> <img src="/Images/ad3.PNG" width="20%" height="auto" />
 
- dsfdsfdsf
