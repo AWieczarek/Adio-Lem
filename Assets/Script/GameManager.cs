@@ -10,12 +10,17 @@ using UnityEngine;
 public class GameManager : NetworkBehaviour
 {
     private GameObject myPlayerListItem;
-    int x;
 
     public override void NetworkStart()
     {
         if (IsServer)
+        {
             SpawnAllPlayers();
+            GameController.Instance.namePlaceHolder.SetActive(false);
+            GameController.Instance.raiseButton.SetActive(false);
+            GameController.Instance.points.SetActive(false);
+
+        }
     }
 
     private void SpawnAllPlayers()
@@ -40,7 +45,7 @@ public class GameManager : NetworkBehaviour
             }
             else
             {
-                if (NetworkManager.Singleton.LocalClientId == GameController.Instance.firstPlayerId)
+                if (NetworkManager.Singleton.LocalClientId == (ulong) GameController.Instance.firstPlayerId)
                     GameController.Instance.animator.SetTrigger("OpenDebil");
                 Invoke("GoToNextRound", 1f);
             }

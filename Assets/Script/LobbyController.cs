@@ -1,7 +1,13 @@
+using System;
 using MLAPI;
 using MLAPI.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using MLAPI.Prototyping;
+using MLAPI.Transports;
+using MLAPI.Transports.UNET;
 using TMPro;
 using UnityEngine;
 
@@ -13,6 +19,13 @@ public class LobbyController : MonoSingleton<LobbyController>
     [SerializeField] public GameObject playerListItemPrefab;
     [SerializeField] public TMP_InputField playerNameInput;
 
+    [SerializeField] private GameObject playButton;
+    [SerializeField] private GameObject nameChanger;
+
+
+    private UNetTransport transport;
+    [SerializeField] private GameObject ipInputBox;
+
 
     private void Start()
     {
@@ -21,7 +34,10 @@ public class LobbyController : MonoSingleton<LobbyController>
 
     public void OnClientButton()
     {
+        // GetIpFromInputBox();
         NetworkManager.Singleton.StartClient();
+        nameChanger.SetActive(true);
+
         animator.SetTrigger("OpenLobby");
     }
 
@@ -33,13 +49,23 @@ public class LobbyController : MonoSingleton<LobbyController>
 
     public void OnServerButton()
     {
+        // GetIpFromInputBox();
         NetworkManager.Singleton.StartServer();
+        playButton.SetActive(true);
         animator.SetTrigger("OpenLobby");
     }
+
+    // private void GetIpFromInputBox()
+    // {
+    //     transport = NetworkManager.Singleton.GetComponent<UNetTransport>();
+    //     transport.ConnectAddress = ipInputBox.GetComponent<TMP_Text>().text;
+    // }
 
     public void OnLobbyBackButton()
     {
         animator.SetTrigger("OpenStart");
+        playButton.SetActive(false);
+        nameChanger.SetActive(false);
         NetworkManager.Singleton.Shutdown();
     }
 

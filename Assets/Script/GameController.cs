@@ -21,12 +21,17 @@ public class GameController : MonoSingleton<GameController>
     public float maxTimeOnTimer = 5f;
     float timeLeft;
 
-    public ulong firstPlayerId;
+    public int firstPlayerId;
     public GameObject GoToNextRoundButton;
 
     public int voteCounter = 0;
     public int positiveVoteCounter = 0;
     public int players = 0;
+    
+    [SerializeField] public GameObject namePlaceHolder;
+    [SerializeField] public GameObject raiseButton;
+    [SerializeField] public GameObject points;
+
 
     private void Start()
     {
@@ -118,18 +123,18 @@ public class GameController : MonoSingleton<GameController>
         }
     }
 
-    public void OnRaiseButtonClick()
-    {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
-        {
-            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
-            if (player)
-            {
-                player.SelectFirstPlayer(networkClient.ClientId);
-            }
-        }
-        exe.OnPauseMedia();
-    }
+    // public void OnRaiseButtonClick()
+    // {
+    //     if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+    //     {
+    //         var player = networkClient.PlayerObject.GetComponent<PlayerController>();
+    //         if (player)
+    //         {
+    //             player.SelectFirstPlayer(networkClient.ClientId);
+    //         }
+    //     }
+    //     exe.OnPauseMedia();
+    // }
 
     public void OnSpotifyPanelButton()
     {
@@ -222,18 +227,6 @@ public class GameController : MonoSingleton<GameController>
                 player.IncreaseVoteCounter();
                 player.IncreasePositiveVoteCounter();
                 OnVoteListButton();
-            }
-        }
-    }
-
-    public void GoToNextRound()
-    {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
-        {
-            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
-            if (player)
-            {
-                player.GoToNextRound();
             }
         }
     }

@@ -4,12 +4,12 @@ using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
 using System;
 using System.Collections.Generic;
+using MLAPI.Spawning;
 using TMPro;
 using UnityEngine;
 
 public class PlayerController : NetworkBehaviour
 {
-
     public NetworkVariableString playerName = new NetworkVariableString(new NetworkVariableSettings
     {
         WritePermission = NetworkVariablePermission.OwnerOnly,
@@ -22,6 +22,11 @@ public class PlayerController : NetworkBehaviour
         ReadPermission = NetworkVariablePermission.Everyone
     });
 
+    public NetworkVariableInt firstSelected = new NetworkVariableInt(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.ServerOnly
+    });
+
     public NetworkVariableInt playerTrigger = new NetworkVariableInt(new NetworkVariableSettings
     {
         WritePermission = NetworkVariablePermission.OwnerOnly,
@@ -30,12 +35,14 @@ public class PlayerController : NetworkBehaviour
 
     private GameObject myPlayerListItem;
     private TextMeshProUGUI playerNameLabel;
+    private ulong idFirst = 0;
 
     public override void NetworkStart()
     {
         RegisterEvents();
 
-        myPlayerListItem = Instantiate(LobbyController.Instance.playerListItemPrefab, Vector3.zero, Quaternion.identity);
+        myPlayerListItem =
+            Instantiate(LobbyController.Instance.playerListItemPrefab, Vector3.zero, Quaternion.identity);
         myPlayerListItem.transform.SetParent(LobbyController.Instance.playerListContainer, false);
 
         playerNameLabel = myPlayerListItem.GetComponentInChildren<TextMeshProUGUI>();
@@ -68,7 +75,7 @@ public class PlayerController : NetworkBehaviour
 
     public void AddPosints()
     {
-        if (NetworkManager.Singleton.LocalClientId == GameController.Instance.firstPlayerId)
+        if (NetworkManager.Singleton.LocalClientId == (ulong)GameController.Instance.firstPlayerId)
             playerPoints.Value += 300;
     }
 
@@ -83,16 +90,25 @@ public class PlayerController : NetworkBehaviour
     private void RegisterEvents()
     {
         playerName.OnValueChanged += OnPlayerNameChange;
+        firstSelected.OnValueChanged += OnFirstPlayerChange;
     }
 
     private void UnRegisterEvents()
     {
         playerName.OnValueChanged -= OnPlayerNameChange;
+        firstSelected.OnValueChanged -= OnFirstPlayerChange;
     }
 
     private void OnPlayerNameChange(string previousValue, string newValue)
     {
         playerNameLabel.text = playerName.Value;
+    }
+
+    private void OnFirstPlayerChange(int previousValue, int newValue)
+    {
+        if(!IsClient){return;}
+    
+        Debug.Log("Zmieniam wartość.");
     }
 
     [ServerRpc]
@@ -103,7 +119,11 @@ public class PlayerController : NetworkBehaviour
 
     public void Play()
     {
-        if (!IsOwner) { return; }
+        if (!IsOwner)
+        {
+            return;
+        }
+
         PlayServerRpc();
         GameController.Instance.exe.OnPlayMedia();
     }
@@ -116,7 +136,11 @@ public class PlayerController : NetworkBehaviour
 
     public void Pause()
     {
-        if (!IsOwner) { return; }
+        if (!IsOwner)
+        {
+            return;
+        }
+
         PauseServerRpc();
         GameController.Instance.exe.OnPauseMedia();
     }
@@ -130,7 +154,11 @@ public class PlayerController : NetworkBehaviour
 
     public void Next()
     {
-        if (!IsOwner) { return; }
+        if (!IsOwner)
+        {
+            return;
+        }
+
         NextServerRpc();
         GameController.Instance.exe.OnNextMedia();
     }
@@ -143,61 +171,122 @@ public class PlayerController : NetworkBehaviour
 
     public void Prev()
     {
-        if (!IsOwner) { return; }
+        if (!IsOwner)
+        {
+            return;
+        }
+
         PrevServerRpc();
         GameController.Instance.exe.OnPreviousMedia();
     }
-
-    public void SelectFirstPlayer(ulong id)
+    
+    public void UpdateNumber(int newNumber)
     {
-        if (!IsOwner) { return; }
-        if (GameController.Instance.firstPlayerNameLabel.text != "") { return; }
-        GameController.Instance.exe.OnPauseMedia();
-        SelectFirstPlayerServerRpc(id);
-        GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
-        GameController.Instance.firstPlayerId = id;
-        if (NetworkManager.Singleton.LocalClientId != id)
-            GameController.Instance.GoToNextRoundButton.SetActive(false);
-        Invoke("OnTurnOnTimer", 1f);
-    }
+        firstSelected.Value = newNumber;
+        if (GameController.Instance.firstPlayerId == 0)
+        {
+            //     // GameController.Instance.exe.OnPauseMedia();
 
-    [ServerRpc]
-    private void SelectFirstPlayerServerRpc(ulong id)
-    {
-        SelectFirstPlayerClientRpc(id);
-        GameController.Instance.exe.OnPauseMedia();
-        GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
-        GameController.Instance.firstPlayerId = id;
-        if (NetworkManager.Singleton.LocalClientId != id)
-            GameController.Instance.GoToNextRoundButton.SetActive(false);
-        Invoke("OnTurnOnTimerServer", 1f);
+            GameController.Instance.firstPlayerNameLabel.text = newNumber.ToString();
+            GameController.Instance.firstPlayerId = newNumber;
+            GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
+            if (NetworkManager.Singleton.LocalClientId != (ulong)newNumber)
+                GameController.Instance.GoToNextRoundButton.SetActive(false);
+            TestClientRPC(newNumber);
+            Invoke("OnTurnOnTimerServer", 1f);
+        }
+        else
+        {
+            FailClientRPC();
+        }
     }
 
     [ClientRpc]
-    private void SelectFirstPlayerClientRpc(ulong id)
+    private void FailClientRPC()
     {
-        if (IsOwner) { return; }
-        GameController.Instance.exe.OnPauseMedia();
+        Debug.Log("Niestety wygrał: gracz nr: " + GameController.Instance.firstPlayerId.ToString());
+    }
+
+    [ClientRpc]
+    private void TestClientRPC(int newNumber)
+    {
+        
+        //     // GameController.Instance.exe.OnPauseMedia();
+
+        GameController.Instance.firstPlayerNameLabel.text = newNumber.ToString();
+        GameController.Instance.firstPlayerId = newNumber;
         GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
-        GameController.Instance.firstPlayerId = id;
-        if (NetworkManager.Singleton.LocalClientId != id)
+        if (NetworkManager.Singleton.LocalClientId != (ulong)newNumber)
             GameController.Instance.GoToNextRoundButton.SetActive(false);
         Invoke("OnTurnOnTimer", 1f);
     }
+    
+
+    // public void SelectFirstPlayer(ulong id)
+    // {
+    //     if (!IsOwner) { return; }
+    //     if (GameController.Instance.firstPlayerNameLabel.text != "") { return; }
+    //     // GameController.Instance.exe.OnPauseMedia();
+    //     SelectFirstPlayerServerRpc(id);
+    //     GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
+    //     GameController.Instance.firstPlayerId = firstSelected.Value;
+    //     if (NetworkManager.Singleton.LocalClientId != firstSelected.Value)
+    //         GameController.Instance.GoToNextRoundButton.SetActive(false);
+    //     if(firstSelected.Value == 0) 
+    //         firstSelected.Value = id;
+    //     Invoke("OnTurnOnTimer", 1f);
+    // }
+    //
+    // [ServerRpc]
+    // private void SelectFirstPlayerServerRpc(ulong id)
+    // {
+    //     if (firstSelected.Value != 0) {return;}
+    //     SelectFirstPlayerClientRpc(id);
+    //     // GameController.Instance.exe.OnPauseMedia();
+    //     GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
+    //     GameController.Instance.firstPlayerId = firstSelected.Value;
+    //     if (NetworkManager.Singleton.LocalClientId != firstSelected.Value)
+    //         GameController.Instance.GoToNextRoundButton.SetActive(false);
+    //     if(firstSelected.Value == 0) 
+    //         firstSelected.Value = id;
+    //     Invoke("OnTurnOnTimerServer", 1f);
+    // }
+    //
+    // [ClientRpc]
+    // private void SelectFirstPlayerClientRpc(ulong id)
+    // {
+    //     if (IsOwner) { return; }
+    //     if (firstSelected.Value != 0) {return;}
+    //     // GameController.Instance.exe.OnPauseMedia();
+    //     GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
+    //     GameController.Instance.firstPlayerId = firstSelected.Value;
+    //     if (NetworkManager.Singleton.LocalClientId != firstSelected.Value)
+    //         GameController.Instance.GoToNextRoundButton.SetActive(false);
+    //     Debug.Log("przed: " + firstSelected.Value);
+    //     if(firstSelected.Value == 0) 
+    //         firstSelected.Value = id;
+    //     Invoke("OnTurnOnTimer", 1f);
+    // }
 
     private void OnTurnOnTimer()
     {
         GameController.Instance.OnTurnOnTimer();
         GameController.Instance.firstPlayerNameLabel.text = "";
     }
+
     private void OnTurnOnTimerServer()
     {
         GameController.Instance.OnTurnOnTimerServer();
         GameController.Instance.firstPlayerNameLabel.text = "";
     }
+
     public void OpenRecentSong()
     {
-        if (!IsOwner) { return; }
+        if (!IsOwner)
+        {
+            return;
+        }
+
         OpenRecentSongServerRpc();
         GameController.Instance.OnRecentSongButton();
     }
@@ -212,14 +301,21 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void OpenRecentSongClientRpc()
     {
-        if (IsOwner) { return; }
+        if (IsOwner)
+        {
+            return;
+        }
+
         GameController.Instance.OnRecentSongButton();
     }
 
 
     public void GoToNextRound()
     {
-        if (!IsOwner) { return; }
+        if (!IsOwner)
+        {
+            return;
+        }
         GoToNextRoundServerRpc();
         GameController.Instance.exe.OnNextMedia();
         GameController.Instance.exe.OnPlayMedia();
@@ -230,6 +326,7 @@ public class PlayerController : NetworkBehaviour
         GameController.Instance.GoToNextRoundButton.SetActive(true);
         GameController.Instance.voteCounter = 0;
         GameController.Instance.positiveVoteCounter = 0;
+        GameController.Instance.firstPlayerId = 0;
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -245,26 +342,37 @@ public class PlayerController : NetworkBehaviour
         GameController.Instance.GoToNextRoundButton.SetActive(true);
         GameController.Instance.voteCounter = 0;
         GameController.Instance.positiveVoteCounter = 0;
+        GameController.Instance.firstPlayerId = 0;
+
     }
 
     [ClientRpc]
     private void GoToNextRoundClientRpc()
     {
-        if (IsOwner) { return; }
+        if (IsOwner)
+        {
+            return;
+        }
+
         GameController.Instance.exe.OnNextMedia();
         GameController.Instance.exe.OnPlayMedia();
         GameController.Instance.maxTimeOnTimer = 5f;
         GameController.Instance.OnBackToGameButton();
-        if(IsOwner)
+        if (IsOwner)
             GameController.Instance.playerPointsLabel.text = playerPoints.Value.ToString();
         GameController.Instance.GoToNextRoundButton.SetActive(true);
         GameController.Instance.voteCounter = 0;
         GameController.Instance.positiveVoteCounter = 0;
+        GameController.Instance.firstPlayerId = 0;
     }
 
     public void ResetTriggers()
     {
-        if (!IsOwner) { return; }
+        if (!IsOwner)
+        {
+            return;
+        }
+
         ResetTriggersServerRpc();
         GameController.Instance.SetNeutralTrigger();
     }
@@ -279,14 +387,22 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void ResetTriggersClientRpc()
     {
-        if (IsOwner) { return; }
+        if (IsOwner)
+        {
+            return;
+        }
+
         GameController.Instance.SetNeutralTrigger();
     }
 
 
     public void IncreaseVoteCounter()
     {
-        if (!IsOwner) { return; }
+        if (!IsOwner)
+        {
+            return;
+        }
+
         IncreaseVoteCounterServerRpc();
         GameController.Instance.voteCounter += 1;
     }
@@ -301,13 +417,21 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void IncreaseVoteCounterClientRpc()
     {
-        if (IsOwner) { return; }
+        if (IsOwner)
+        {
+            return;
+        }
+
         GameController.Instance.voteCounter += 1;
     }
 
     public void IncreasePositiveVoteCounter()
     {
-        if (!IsOwner) { return; }
+        if (!IsOwner)
+        {
+            return;
+        }
+
         IncreasePositiveVoteCounterServerRpc();
         GameController.Instance.positiveVoteCounter += 1;
     }
@@ -322,14 +446,22 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void IncreasePositiveVoteCounterClientRpc()
     {
-        if (IsOwner) { return; }
+        if (IsOwner)
+        {
+            return;
+        }
+
         GameController.Instance.positiveVoteCounter += 1;
     }
 
 
     public void IncreasePlayerCouter()
     {
-        if (!IsOwner) { return; }
+        if (!IsOwner)
+        {
+            return;
+        }
+
         IncreasePlayerCouterServerRpc();
         GameController.Instance.players += 1;
     }
@@ -344,8 +476,11 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void IncreasePlayerCouterClientRpc()
     {
-        if (IsOwner) { return; }
+        if (IsOwner)
+        {
+            return;
+        }
+
         GameController.Instance.players += 1;
     }
-
 }
