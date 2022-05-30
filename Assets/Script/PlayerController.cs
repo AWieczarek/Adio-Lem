@@ -1,10 +1,7 @@
+using System.Linq;
 using MLAPI;
-using MLAPI.Connection;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
-using System;
-using System.Collections.Generic;
-using MLAPI.Spawning;
 using TMPro;
 using UnityEngine;
 
@@ -185,7 +182,7 @@ public class PlayerController : NetworkBehaviour
         firstSelected.Value = newNumber;
         if (GameController.Instance.firstPlayerId == 0)
         {
-            //     // GameController.Instance.exe.OnPauseMedia();
+            GameController.Instance.exe.OnPauseMedia();
 
             GameController.Instance.firstPlayerNameLabel.text = newNumber.ToString();
             GameController.Instance.firstPlayerId = newNumber;
@@ -211,8 +208,8 @@ public class PlayerController : NetworkBehaviour
     private void TestClientRPC(int newNumber)
     {
         
-        //     // GameController.Instance.exe.OnPauseMedia();
-
+        GameController.Instance.exe.OnPauseMedia();
+        
         GameController.Instance.firstPlayerNameLabel.text = newNumber.ToString();
         GameController.Instance.firstPlayerId = newNumber;
         GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
@@ -220,53 +217,6 @@ public class PlayerController : NetworkBehaviour
             GameController.Instance.GoToNextRoundButton.SetActive(false);
         Invoke("OnTurnOnTimer", 1f);
     }
-    
-
-    // public void SelectFirstPlayer(ulong id)
-    // {
-    //     if (!IsOwner) { return; }
-    //     if (GameController.Instance.firstPlayerNameLabel.text != "") { return; }
-    //     // GameController.Instance.exe.OnPauseMedia();
-    //     SelectFirstPlayerServerRpc(id);
-    //     GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
-    //     GameController.Instance.firstPlayerId = firstSelected.Value;
-    //     if (NetworkManager.Singleton.LocalClientId != firstSelected.Value)
-    //         GameController.Instance.GoToNextRoundButton.SetActive(false);
-    //     if(firstSelected.Value == 0) 
-    //         firstSelected.Value = id;
-    //     Invoke("OnTurnOnTimer", 1f);
-    // }
-    //
-    // [ServerRpc]
-    // private void SelectFirstPlayerServerRpc(ulong id)
-    // {
-    //     if (firstSelected.Value != 0) {return;}
-    //     SelectFirstPlayerClientRpc(id);
-    //     // GameController.Instance.exe.OnPauseMedia();
-    //     GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
-    //     GameController.Instance.firstPlayerId = firstSelected.Value;
-    //     if (NetworkManager.Singleton.LocalClientId != firstSelected.Value)
-    //         GameController.Instance.GoToNextRoundButton.SetActive(false);
-    //     if(firstSelected.Value == 0) 
-    //         firstSelected.Value = id;
-    //     Invoke("OnTurnOnTimerServer", 1f);
-    // }
-    //
-    // [ClientRpc]
-    // private void SelectFirstPlayerClientRpc(ulong id)
-    // {
-    //     if (IsOwner) { return; }
-    //     if (firstSelected.Value != 0) {return;}
-    //     // GameController.Instance.exe.OnPauseMedia();
-    //     GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
-    //     GameController.Instance.firstPlayerId = firstSelected.Value;
-    //     if (NetworkManager.Singleton.LocalClientId != firstSelected.Value)
-    //         GameController.Instance.GoToNextRoundButton.SetActive(false);
-    //     Debug.Log("przed: " + firstSelected.Value);
-    //     if(firstSelected.Value == 0) 
-    //         firstSelected.Value = id;
-    //     Invoke("OnTurnOnTimer", 1f);
-    // }
 
     private void OnTurnOnTimer()
     {
@@ -316,6 +266,8 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
+        Debug.Log(playerPoints.ToString());
+
         GoToNextRoundServerRpc();
         GameController.Instance.exe.OnNextMedia();
         GameController.Instance.exe.OnPlayMedia();
@@ -333,6 +285,7 @@ public class PlayerController : NetworkBehaviour
     private void GoToNextRoundServerRpc()
     {
         GoToNextRoundClientRpc();
+        Debug.Log(playerPoints.ToString());
         GameController.Instance.exe.OnNextMedia();
         GameController.Instance.exe.OnPlayMedia();
         GameController.Instance.maxTimeOnTimer = 5f;
@@ -353,7 +306,7 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-
+        Debug.Log(playerPoints.ToString());
         GameController.Instance.exe.OnNextMedia();
         GameController.Instance.exe.OnPlayMedia();
         GameController.Instance.maxTimeOnTimer = 5f;

@@ -50,6 +50,7 @@ public class GameManager : NetworkBehaviour
                 Invoke("GoToNextRound", 1f);
             }
             ResetAllTriggers();
+            Debug.Log(GameController.Instance.table);
         }
     }
 
@@ -68,6 +69,7 @@ public class GameManager : NetworkBehaviour
         {
             PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
             pc.ResetTriggers();
+            Debug.Log("Dupa");
         }
     }
 

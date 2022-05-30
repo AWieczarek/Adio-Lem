@@ -22,12 +22,13 @@ public class GameController : MonoSingleton<GameController>
     float timeLeft;
 
     public int firstPlayerId;
+    public int[] table;
     public GameObject GoToNextRoundButton;
 
     public int voteCounter = 0;
     public int positiveVoteCounter = 0;
     public int players = 0;
-    
+
     [SerializeField] public GameObject namePlaceHolder;
     [SerializeField] public GameObject raiseButton;
     [SerializeField] public GameObject points;
@@ -35,7 +36,8 @@ public class GameController : MonoSingleton<GameController>
 
     private void Start()
     {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.ServerClientId, out var networkedClient))
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.ServerClientId,
+                out var networkedClient))
         {
             var player = networkedClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
@@ -43,61 +45,22 @@ public class GameController : MonoSingleton<GameController>
                 player.CreateGameManager();
             }
         }
-        setName();
+
+        SetName();
         OnPlayButton();
-        if(NetworkManager.Singleton.IsServer)
+        if (NetworkManager.Singleton.IsServer)
         {
             GameObject go = Instantiate(GameController.Instance.gameManagerPrefab);
             go.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
         }
+
         IncreasePlayerCouter();
     }
 
-    public void OnPlayButton()
+    public void SetName()
     {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
-        {
-            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
-            if (player)
-            {
-                player.Play();
-            }
-        }
-    }
-
-    public void OnPauseButton()
-    {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
-        {
-            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
-            if (player)
-                player.Pause();
-        }
-    }
-
-    public void OnNextButton()
-    {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
-        {
-            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
-            if (player)
-                player.Next();
-        }
-    }
-
-    public void OnPrevButton()
-    {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
-        {
-            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
-            if (player)
-                player.Prev();
-        }
-    }
-
-    public void setName()
-    {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
+                out var networkClient))
         {
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
@@ -106,14 +69,14 @@ public class GameController : MonoSingleton<GameController>
                 {
                     playerNameLabel.text = player.playerName.Value;
                 }
-
             }
         }
     }
 
     public void IncreasePlayerCouter()
     {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
+                out var networkClient))
         {
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
@@ -122,19 +85,6 @@ public class GameController : MonoSingleton<GameController>
             }
         }
     }
-
-    // public void OnRaiseButtonClick()
-    // {
-    //     if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
-    //     {
-    //         var player = networkClient.PlayerObject.GetComponent<PlayerController>();
-    //         if (player)
-    //         {
-    //             player.SelectFirstPlayer(networkClient.ClientId);
-    //         }
-    //     }
-    //     exe.OnPauseMedia();
-    // }
 
     public void OnSpotifyPanelButton()
     {
@@ -150,6 +100,7 @@ public class GameController : MonoSingleton<GameController>
     {
         animator.SetTrigger("OpenYesNo");
     }
+
     public void OnRecentSongButton()
     {
         animator.SetTrigger("OpenRecentSong");
@@ -181,9 +132,29 @@ public class GameController : MonoSingleton<GameController>
         Invoke("OnRecentSongServer", 5f);
     }
 
+    public void OnPlayButton()
+    {
+        exe.OnPlayMedia();
+    }
+
+    public void OnPauseButton()
+    {
+        exe.OnPauseMedia();
+    }
+
+    public void OnNextButton()
+    {
+        exe.OnNextMedia();
+    }
+
+    public void OnPrevButton()
+    {
+        exe.OnPreviousMedia();
+    }
+
     private void Update()
     {
-        if(timeLeft > 0)
+        if (timeLeft > 0)
         {
             timeLeft -= Time.deltaTime;
             timerBar.fillAmount = timeLeft / maxTimeOnTimer;
@@ -192,7 +163,8 @@ public class GameController : MonoSingleton<GameController>
 
     public void SetNeutralTrigger()
     {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
+                out var networkClient))
         {
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
@@ -204,7 +176,8 @@ public class GameController : MonoSingleton<GameController>
 
     public void SetRedTrigger()
     {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
+                out var networkClient))
         {
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
@@ -218,7 +191,8 @@ public class GameController : MonoSingleton<GameController>
 
     public void SetGreenTrigger()
     {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
+                out var networkClient))
         {
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
