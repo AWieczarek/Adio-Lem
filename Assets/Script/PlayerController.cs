@@ -32,7 +32,6 @@ public class PlayerController : NetworkBehaviour
 
     private GameObject myPlayerListItem;
     private TextMeshProUGUI playerNameLabel;
-    private ulong idFirst = 0;
 
     public override void NetworkStart()
     {
@@ -46,8 +45,7 @@ public class PlayerController : NetworkBehaviour
 
         if (IsOwner)
         {
-            if (NetworkManager.Singleton.LocalClientId == 0) playerName.Value = "Player " + "1";
-            else playerName.Value = "Player " + NetworkManager.Singleton.LocalClientId;
+            playerName.Value = "Player " + (NetworkManager.Singleton.LocalClientId - 1);
         }
         else
         {
@@ -266,8 +264,6 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-        Debug.Log(playerPoints.ToString());
-
         GoToNextRoundServerRpc();
         GameController.Instance.exe.OnNextMedia();
         GameController.Instance.exe.OnPlayMedia();
@@ -285,7 +281,6 @@ public class PlayerController : NetworkBehaviour
     private void GoToNextRoundServerRpc()
     {
         GoToNextRoundClientRpc();
-        Debug.Log(playerPoints.ToString());
         GameController.Instance.exe.OnNextMedia();
         GameController.Instance.exe.OnPlayMedia();
         GameController.Instance.maxTimeOnTimer = 5f;
@@ -306,7 +301,6 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-        Debug.Log(playerPoints.ToString());
         GameController.Instance.exe.OnNextMedia();
         GameController.Instance.exe.OnPlayMedia();
         GameController.Instance.maxTimeOnTimer = 5f;

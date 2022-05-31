@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using MLAPI;
+using MLAPI.Connection;
 using MLAPI.Messaging;
 using MLAPI.Spawning;
 using UnityEngine;
@@ -23,5 +25,11 @@ public class FirstPlayerGenerator : NetworkBehaviour
 
         Debug.Log((int)senderId);
         numberHolder.UpdateNumber((int)senderId);
+
+        foreach (KeyValuePair<ulong, NetworkClient> nc in NetworkManager.Singleton.ConnectedClients)
+        {
+            PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
+            Debug.Log(pc.playerPoints.Value);
+        }
     }
 }

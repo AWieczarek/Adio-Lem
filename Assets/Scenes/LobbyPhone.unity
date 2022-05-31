@@ -973,7 +973,6 @@ MonoBehaviour:
   playerNameInput: {fileID: 399317532}
   playButton: {fileID: 1340840579}
   nameChanger: {fileID: 1243133003}
-  ipInputBox: {fileID: 2101668337}
 --- !u!4 &496304999
 Transform:
   m_ObjectHideFlags: 0
@@ -3932,7 +3931,7 @@ MonoBehaviour:
     RegisteredScenes:
     - LobbyPhone
     - GamePhone
-    - GamePC
+    - EndPhone
     AllowRuntimeSceneChanges: 0
     NetworkPrefabs:
     - Prefab: {fileID: 710324068488005934, guid: eff7a8cee3535b5409cdd9dba98233b8, type: 3}
@@ -3940,6 +3939,8 @@ MonoBehaviour:
     - Prefab: {fileID: 2960636496177680371, guid: 18f741c008cb03b4196345940436da40, type: 3}
       PlayerPrefab: 0
     - Prefab: {fileID: 8537193687394380464, guid: 5cf613b2ba46ae24c8c5d372e4306f44, type: 3}
+      PlayerPrefab: 0
+    - Prefab: {fileID: 3973806049696855690, guid: 73d9a1e976d92354c97205fb7352c1cc, type: 3}
       PlayerPrefab: 0
     PlayerPrefabHash:
       id: 0

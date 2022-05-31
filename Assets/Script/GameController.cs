@@ -2,6 +2,7 @@ using MLAPI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using MLAPI.SceneManagement;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -63,6 +64,11 @@ public class GameController : MonoSingleton<GameController>
         }
 
         IncreasePlayerCounter();
+    }
+    
+    public void OnEndButton()
+    {
+        NetworkSceneManager.SwitchScene("EndPhone");
     }
 
     private void SetName()

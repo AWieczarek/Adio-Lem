@@ -1,14 +1,7 @@
+using System.Collections.Generic;
 using MLAPI;
 using MLAPI.Connection;
-using MLAPI.Messaging;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
@@ -54,19 +47,18 @@ public class GameManager : NetworkBehaviour
     {
         if (GameController.Instance.voteCounter == GameController.Instance.players)
         {
-            Debug.Log(GameController.Instance.positiveVoteCounter);
-            Debug.Log(GameController.Instance.voteCounter);
-            if (GameController.Instance.positiveVoteCounter >= (GameController.Instance.voteCounter / 2))
+            if (GameController.Instance.positiveVoteCounter > (GameController.Instance.voteCounter / 2))
             {
                 AddPoints();
                 GoToNextRound();
             }
             else
             {
-                if (NetworkManager.Singleton.LocalClientId == (ulong) GameController.Instance.firstPlayerId)
+                if (NetworkManager.Singleton.LocalClientId == (ulong)GameController.Instance.firstPlayerId)
                     GameController.Instance.animator.SetTrigger("OpenDebil");
                 Invoke("GoToNextRound", 1f);
             }
+
             ResetAllTriggers();
         }
     }
@@ -97,5 +89,4 @@ public class GameManager : NetworkBehaviour
             pc.GoToNextRound();
         }
     }
-
 }
