@@ -4,8 +4,11 @@ using MLAPI.Messaging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
@@ -19,8 +22,21 @@ public class GameManager : NetworkBehaviour
             GameController.Instance.namePlaceHolder.SetActive(false);
             GameController.Instance.raiseButton.SetActive(false);
             GameController.Instance.points.SetActive(false);
-
+            GameController.Instance.spotifyButton.SetActive(true);
+            GameController.Instance.spotifyData.SetActive(true);
+            // Invoke("Test", 5f);
+            //
+            // for (int i = 0; i < 5; i++)
+            // {
+            //     Debug.Log(i+1);
+            //     Thread.Sleep(1000);
+            // }
         }
+    }
+
+    void Test()
+    {
+        GameController.Instance.OnPlayButton();
     }
 
     private void SpawnAllPlayers()
@@ -38,7 +54,9 @@ public class GameManager : NetworkBehaviour
     {
         if (GameController.Instance.voteCounter == GameController.Instance.players)
         {
-            if (GameController.Instance.positiveVoteCounter >= Math.Round((double)(GameController.Instance.voteCounter / 2)))
+            Debug.Log(GameController.Instance.positiveVoteCounter);
+            Debug.Log(GameController.Instance.voteCounter);
+            if (GameController.Instance.positiveVoteCounter >= (GameController.Instance.voteCounter / 2))
             {
                 AddPoints();
                 GoToNextRound();
@@ -50,7 +68,6 @@ public class GameManager : NetworkBehaviour
                 Invoke("GoToNextRound", 1f);
             }
             ResetAllTriggers();
-            Debug.Log(GameController.Instance.table);
         }
     }
 
@@ -69,7 +86,6 @@ public class GameManager : NetworkBehaviour
         {
             PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
             pc.ResetTriggers();
-            Debug.Log("Dupa");
         }
     }
 

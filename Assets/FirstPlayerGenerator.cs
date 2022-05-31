@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class FirstPlayerGenerator : NetworkBehaviour
 {
-    public void GenerateNewNumber() => GenerateNewNumberServerRpc();
+    public void SelectFirstPlayer() => SelectFirstPlayerServerRpc();
 
     [ServerRpc(RequireOwnership = false)]
-    private void GenerateNewNumberServerRpc(ServerRpcParams serverRpcParams = default)
+    private void SelectFirstPlayerServerRpc(ServerRpcParams serverRpcParams = default)
     {
         ulong senderId = serverRpcParams.Receive.SenderClientId;
 

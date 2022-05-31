@@ -408,26 +408,26 @@ public class PlayerController : NetworkBehaviour
     }
 
 
-    public void IncreasePlayerCouter()
+    public void IncreasePlayerCounter()
     {
         if (!IsOwner)
         {
             return;
         }
 
-        IncreasePlayerCouterServerRpc();
+        IncreasePlayerCounterServerRpc();
         GameController.Instance.players += 1;
     }
 
     [ServerRpc]
-    private void IncreasePlayerCouterServerRpc()
+    private void IncreasePlayerCounterServerRpc()
     {
-        IncreasePlayerCouterClientRpc();
+        IncreasePlayerCounterClientRpc();
         GameController.Instance.players += 1;
     }
 
     [ClientRpc]
-    private void IncreasePlayerCouterClientRpc()
+    private void IncreasePlayerCounterClientRpc()
     {
         if (IsOwner)
         {

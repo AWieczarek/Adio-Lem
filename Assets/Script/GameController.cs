@@ -19,7 +19,7 @@ public class GameController : MonoSingleton<GameController>
 
     public Image timerBar;
     public float maxTimeOnTimer = 5f;
-    float timeLeft;
+    private float timeLeft;
 
     public int firstPlayerId;
     public int[] table;
@@ -32,6 +32,14 @@ public class GameController : MonoSingleton<GameController>
     [SerializeField] public GameObject namePlaceHolder;
     [SerializeField] public GameObject raiseButton;
     [SerializeField] public GameObject points;
+    [SerializeField] public GameObject spotifyButton;
+    [SerializeField] public GameObject spotifyData;
+    private static readonly int OpenTimer = Animator.StringToHash("OpenTimer");
+    private static readonly int OpenVote = Animator.StringToHash("OpenVote");
+    private static readonly int OpenRecentSong = Animator.StringToHash("OpenRecentSong");
+    private static readonly int OpenYesNo = Animator.StringToHash("OpenYesNo");
+    private static readonly int OpenGame = Animator.StringToHash("OpenGame");
+    private static readonly int OpenSpotify = Animator.StringToHash("OpenSpotify");
 
 
     private void Start()
@@ -54,10 +62,10 @@ public class GameController : MonoSingleton<GameController>
             go.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
         }
 
-        IncreasePlayerCouter();
+        IncreasePlayerCounter();
     }
 
-    public void SetName()
+    private void SetName()
     {
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
                 out var networkClient))
@@ -73,7 +81,7 @@ public class GameController : MonoSingleton<GameController>
         }
     }
 
-    public void IncreasePlayerCouter()
+    private void IncreasePlayerCounter()
     {
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
                 out var networkClient))
@@ -81,53 +89,53 @@ public class GameController : MonoSingleton<GameController>
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
             {
-                player.IncreasePlayerCouter();
+                player.IncreasePlayerCounter();
             }
         }
     }
 
     public void OnSpotifyPanelButton()
     {
-        animator.SetTrigger("OpenSpotify");
+        animator.SetTrigger(OpenSpotify);
     }
 
     public void OnBackToGameButton()
     {
-        animator.SetTrigger("OpenGame");
+        animator.SetTrigger(OpenGame);
     }
 
     public void OnYesNoButton()
     {
-        animator.SetTrigger("OpenYesNo");
+        animator.SetTrigger(OpenYesNo);
     }
 
     public void OnRecentSongButton()
     {
-        animator.SetTrigger("OpenRecentSong");
+        animator.SetTrigger(OpenRecentSong);
         Invoke("OnYesNoButton", 3f);
     }
 
     public void OnRecentSongServer()
     {
-        animator.SetTrigger("OpenRecentSong");
+        animator.SetTrigger(OpenRecentSong);
         Invoke("OnVoteListButton", 3f);
     }
 
     public void OnVoteListButton()
     {
-        animator.SetTrigger("OpenVote");
+        animator.SetTrigger(OpenVote);
     }
 
     public void OnTurnOnTimer()
     {
-        animator.SetTrigger("OpenTimer");
+        animator.SetTrigger(OpenTimer);
         timeLeft = maxTimeOnTimer;
         Invoke("OnRecentSongButton", 5f);
     }
 
     public void OnTurnOnTimerServer()
     {
-        animator.SetTrigger("OpenTimer");
+        animator.SetTrigger(OpenTimer);
         timeLeft = maxTimeOnTimer;
         Invoke("OnRecentSongServer", 5f);
     }
