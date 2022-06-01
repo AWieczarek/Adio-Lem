@@ -17,13 +17,7 @@ public class GameManager : NetworkBehaviour
             GameController.Instance.points.SetActive(false);
             GameController.Instance.spotifyButton.SetActive(true);
             GameController.Instance.spotifyData.SetActive(true);
-            // Invoke("Test", 5f);
-            //
-            // for (int i = 0; i < 5; i++)
-            // {
-            //     Debug.Log(i+1);
-            //     Thread.Sleep(1000);
-            // }
+            GameController.Instance.endButton.SetActive(true);
         }
         else
         {
@@ -33,11 +27,6 @@ public class GameManager : NetworkBehaviour
             GameObject sp = GameObject.Find("Spotify");
             Destroy(sp);
         }
-    }
-
-    void Test()
-    {
-        GameController.Instance.OnPlayButton();
     }
 
     private void SpawnAllPlayers()

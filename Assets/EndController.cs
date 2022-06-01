@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MLAPI;
 using MLAPI.SceneManagement;
+using TMPro;
 using UnityEngine;
 
 public class EndController : MonoSingleton<EndController>
@@ -12,7 +13,7 @@ public class EndController : MonoSingleton<EndController>
     [SerializeField] public Transform playerListContainer;
     [SerializeField] public GameObject playerListItemPrefab;
     
-    [SerializeField] public Transform canvas;
+    [SerializeField] public GameObject endClientText;
 
     public String test;
 
@@ -22,6 +23,7 @@ public class EndController : MonoSingleton<EndController>
         {
             GameObject go = Instantiate(EndController.Instance.endManagerPrefab);
             go.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
+            endClientText.SetActive(false);
         }
 
     }

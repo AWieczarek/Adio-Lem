@@ -2,6 +2,7 @@ using MLAPI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using MLAPI.SceneManagement;
 using TMPro;
 using UnityEngine;
@@ -23,7 +24,6 @@ public class GameController : MonoSingleton<GameController>
     private float timeLeft;
 
     public int firstPlayerId;
-    public int[] table;
     public GameObject GoToNextRoundButton;
 
     public int voteCounter = 0;
@@ -35,6 +35,8 @@ public class GameController : MonoSingleton<GameController>
     [SerializeField] public GameObject points;
     [SerializeField] public GameObject spotifyButton;
     [SerializeField] public GameObject spotifyData;
+    [SerializeField] public GameObject endButton;
+
     private static readonly int OpenTimer = Animator.StringToHash("OpenTimer");
     private static readonly int OpenVote = Animator.StringToHash("OpenVote");
     private static readonly int OpenRecentSong = Animator.StringToHash("OpenRecentSong");
@@ -42,6 +44,17 @@ public class GameController : MonoSingleton<GameController>
     private static readonly int OpenGame = Animator.StringToHash("OpenGame");
     private static readonly int OpenSpotify = Animator.StringToHash("OpenSpotify");
 
+    public TMP_Text countDownTimer;
+
+
+    
+    private void Awake()
+    {
+        animator.SetTrigger("OnCountDown");
+        timeLeft = 5f;
+        Invoke("OnBackToGameButton", 5f);
+        Invoke("OnPlayButton", 5f);
+    }
 
     private void Start()
     {
@@ -56,7 +69,6 @@ public class GameController : MonoSingleton<GameController>
         }
 
         SetName();
-        OnPlayButton();
         if (NetworkManager.Singleton.IsServer)
         {
             GameObject go = Instantiate(GameController.Instance.gameManagerPrefab);
@@ -68,6 +80,7 @@ public class GameController : MonoSingleton<GameController>
     
     public void OnEndButton()
     {
+        OnPauseButton();
         NetworkSceneManager.SwitchScene("EndPhone");
     }
 
@@ -172,6 +185,7 @@ public class GameController : MonoSingleton<GameController>
         {
             timeLeft -= Time.deltaTime;
             timerBar.fillAmount = timeLeft / maxTimeOnTimer;
+            countDownTimer.text = Math.Round(timeLeft).ToString(CultureInfo.InvariantCulture);
         }
     }
 

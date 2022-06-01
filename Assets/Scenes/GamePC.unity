@@ -3198,10 +3198,16 @@ MonoBehaviour:
   timerBar: {fileID: 440518152}
   maxTimeOnTimer: 5
   firstPlayerId: 0
+  table: 
   GoToNextRoundButton: {fileID: 1737106479}
   voteCounter: 0
   positiveVoteCounter: 0
   players: 0
+  namePlaceHolder: {fileID: 0}
+  raiseButton: {fileID: 0}
+  points: {fileID: 0}
+  spotifyButton: {fileID: 0}
+  spotifyData: {fileID: 0}
 --- !u!4 &1157566713
 Transform:
   m_ObjectHideFlags: 0
@@ -4076,7 +4082,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ClientId: ca1e56c8faff41eab92fac8e7806017c
   ConnectionTimeout: 60
-  AutoConnect: 1
+  AutoConnect: 0
   UpdateFrequencyMs: 1000
   LogLevel: 1
   ReuseAuthTokens: 1

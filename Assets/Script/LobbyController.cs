@@ -1,4 +1,5 @@
 using MLAPI;
+using MLAPI.NetworkVariable;
 using MLAPI.SceneManagement;
 using MLAPI.Transports.UNET;
 using TMPro;
@@ -15,6 +16,10 @@ public class LobbyController : MonoSingleton<LobbyController>
     [SerializeField] private GameObject playButton;
     [SerializeField] private GameObject nameChanger;
     
+    [SerializeField] public TMP_InputField ipInputField;
+    [SerializeField] public TMP_InputField messageInputField;
+
+    
     private void Start()
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -22,6 +27,15 @@ public class LobbyController : MonoSingleton<LobbyController>
 
     public void OnClientButton()
     {
+        if (ipInputField.text.Length <= 0)
+        {
+            NetworkManager.Singleton.GetComponent<UNetTransport>().ConnectAddress = "192.168.137.1";
+        }
+        else
+        {
+            NetworkManager.Singleton.GetComponent<UNetTransport>().ConnectAddress = ipInputField.text;
+        }
+        
         NetworkManager.Singleton.StartClient();
         nameChanger.SetActive(true);
 
@@ -36,6 +50,14 @@ public class LobbyController : MonoSingleton<LobbyController>
 
     public void OnServerButton()
     {
+        if (ipInputField.text.Length <= 0)
+        {
+            NetworkManager.Singleton.GetComponent<UNetTransport>().ConnectAddress = "192.168.137.1";
+        }
+        else
+        {
+            NetworkManager.Singleton.GetComponent<UNetTransport>().ConnectAddress = ipInputField.text;
+        }
         NetworkManager.Singleton.StartServer();
         playButton.SetActive(true);
         animator.SetTrigger("OpenLobby");
@@ -62,6 +84,11 @@ public class LobbyController : MonoSingleton<LobbyController>
     public void OnStartLobbyButton()
     {
         NetworkSceneManager.SwitchScene("GamePhone");
+    }
+
+    public void OnIpSubmit()
+    {
+        NetworkManager.Singleton.GetComponent<UNetTransport>().ConnectAddress = ipInputField.text;
     }
 
     public void OnLobbySubmitNameChange()

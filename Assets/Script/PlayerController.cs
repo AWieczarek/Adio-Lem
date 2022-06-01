@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using MLAPI;
 using MLAPI.Messaging;
@@ -25,6 +26,12 @@ public class PlayerController : NetworkBehaviour
     });
 
     public NetworkVariableInt playerTrigger = new NetworkVariableInt(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.OwnerOnly,
+        ReadPermission = NetworkVariablePermission.Everyone
+    });
+    
+    public NetworkVariableString playerLoseMessage = new NetworkVariableString(new NetworkVariableSettings
     {
         WritePermission = NetworkVariablePermission.OwnerOnly,
         ReadPermission = NetworkVariablePermission.Everyone
@@ -101,8 +108,11 @@ public class PlayerController : NetworkBehaviour
 
     private void OnFirstPlayerChange(int previousValue, int newValue)
     {
-        if(!IsClient){return;}
-    
+        if (!IsClient)
+        {
+            return;
+        }
+
         Debug.Log("Zmieniam wartość.");
     }
 
@@ -136,9 +146,8 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void TestClientRPC(int newNumber)
     {
-        
         GameController.Instance.exe.OnPauseMedia();
-        
+
         GameController.Instance.firstPlayerNameLabel.text = newNumber.ToString();
         GameController.Instance.firstPlayerId = newNumber;
         GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
@@ -195,6 +204,7 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
+
         GoToNextRoundServerRpc();
         GameController.Instance.exe.OnNextMedia();
         GameController.Instance.exe.OnPlayMedia();
@@ -222,7 +232,6 @@ public class PlayerController : NetworkBehaviour
         GameController.Instance.voteCounter = 0;
         GameController.Instance.positiveVoteCounter = 0;
         GameController.Instance.firstPlayerId = 0;
-
     }
 
     [ClientRpc]
@@ -232,6 +241,7 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
+
         GameController.Instance.exe.OnNextMedia();
         GameController.Instance.exe.OnPlayMedia();
         GameController.Instance.maxTimeOnTimer = 5f;
