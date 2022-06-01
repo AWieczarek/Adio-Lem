@@ -4413,7 +4413,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ClientId: ca1e56c8faff41eab92fac8e7806017c
   ConnectionTimeout: 60
-  AutoConnect: 0
+  AutoConnect: 1
   UpdateFrequencyMs: 1000
   LogLevel: 1
   ReuseAuthTokens: 1

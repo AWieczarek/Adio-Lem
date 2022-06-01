@@ -25,6 +25,14 @@ public class GameManager : NetworkBehaviour
             //     Thread.Sleep(1000);
             // }
         }
+        else
+        {
+            GameObject sps = GameObject.Find("SpotifyService");
+            Destroy(sps);
+
+            GameObject sp = GameObject.Find("Spotify");
+            Destroy(sp);
+        }
     }
 
     void Test()
