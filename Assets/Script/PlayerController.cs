@@ -30,12 +30,15 @@ public class PlayerController : NetworkBehaviour
         WritePermission = NetworkVariablePermission.OwnerOnly,
         ReadPermission = NetworkVariablePermission.Everyone
     });
+    
+    public NetworkVariableString looserMessage = new NetworkVariableString(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.OwnerOnly,
+        ReadPermission = NetworkVariablePermission.Everyone
+    });
 
     private GameObject m_myPlayerListItem;
     private TextMeshProUGUI m_playerNameLabel;
-    public String text = "Dupa";
-
-
 
     public override void NetworkStart()
     {
@@ -50,6 +53,7 @@ public class PlayerController : NetworkBehaviour
         if (IsOwner)
         {
             playerName.Value = "Player " + (NetworkManager.Singleton.LocalClientId - 1);
+            looserMessage.Value = LobbyController.Instance.messageInputField.text;
         }
         else
         {
@@ -84,6 +88,13 @@ public class PlayerController : NetworkBehaviour
             playerName.Value = newName;
 
         m_playerNameLabel.text = playerName.Value;
+    }
+    
+    public void ChangeMessage(string newMessage)
+    {
+        if (IsOwner)
+            looserMessage.Value = newMessage;
+        
     }
 
     private void RegisterEvents()
@@ -124,7 +135,6 @@ public class PlayerController : NetworkBehaviour
             GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
             if (NetworkManager.Singleton.LocalClientId != (ulong)newNumber)
                 GameController.Instance.GoToNextRoundButton.SetActive(false);
-            GameController.Instance.looserMessage.text = "Test";
             UpdateFirstPlayerClientRPC(newNumber);
             Invoke("OnTurnOnTimerServer", 1f);
         }
@@ -137,7 +147,6 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void FailClientRPC()
     {
-        GameController.Instance.looserMessage.text = "Test";
         Debug.Log("Niestety wygrał: gracz nr: " + GameController.Instance.firstPlayerId.ToString());
     }
 
@@ -145,7 +154,6 @@ public class PlayerController : NetworkBehaviour
     private void UpdateFirstPlayerClientRPC(int newNumber)
     {
         GameController.Instance.exe.OnPauseMedia();
-        GameController.Instance.looserMessage.text = "Test";
 
         GameController.Instance.firstPlayerNameLabel.text = newNumber.ToString();
         GameController.Instance.firstPlayerId = newNumber;

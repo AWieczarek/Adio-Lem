@@ -25,10 +25,5 @@ public class FirstPlayerGenerator : NetworkBehaviour
         var numberHolder = playerObject.GetComponent<PlayerController>();
 
         numberHolder.UpdateFirstPlayer((int)senderId);
-
-        foreach (KeyValuePair<ulong, NetworkClient> nc in NetworkManager.Singleton.ConnectedClients)
-        {
-            PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
-        }
     }
 }

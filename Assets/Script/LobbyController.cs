@@ -32,6 +32,7 @@ public class LobbyController : MonoSingleton<LobbyController>
         nameChanger.SetActive(true);
 
         animator.SetTrigger("OpenLobby");
+        OnLobbySubmitLoseMessageChangeChange();
     }
 
     public void OnHostButton()
@@ -99,6 +100,19 @@ public class LobbyController : MonoSingleton<LobbyController>
             var player = networkClient.PlayerObject.GetComponent<PlayerController>();
             if (player)
                 player.ChangeName(newName);
+        }
+    }
+    
+    public void OnLobbySubmitLoseMessageChangeChange()
+    {
+        string newName = messageInputField.text;
+        Debug.Log(newName);
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
+                out var networkClient))
+        {
+            var player = networkClient.PlayerObject.GetComponent<PlayerController>();
+            if (player)
+                player.ChangeMessage(newName);
         }
     }
 }

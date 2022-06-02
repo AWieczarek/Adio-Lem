@@ -52,7 +52,7 @@ public class GameManager : NetworkBehaviour
             else
             {
                 if (NetworkManager.Singleton.LocalClientId == (ulong)GameController.Instance.firstPlayerId)
-                    GameController.Instance.animator.SetTrigger("OpenDebil");
+                    GameController.Instance.animator.SetTrigger("OpenLoseMessage");
                 Invoke("GoToNextRound", 1f);
             }
 

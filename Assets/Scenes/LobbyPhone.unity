@@ -2757,7 +2757,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 496304998}
         m_TargetAssemblyTypeName: LobbyController, Assembly-CSharp
-        m_MethodName: OnSubmitLooserMessageChange
+        m_MethodName: OnLobbySubmitLoseMessageChangeChange
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

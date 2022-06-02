@@ -10,39 +10,38 @@ using UnityEngine;
 using UnityEngine.UI;
 public class SpotifyController : SpotifyUIBase
 {
-    [SerializeField] private GameObject m_connectCanvas = null;
-    [SerializeField] private GameObject m_connectingSpinner = null;
+    [SerializeField] private GameObject connectCanvas = null;
+    [SerializeField] private GameObject connectingSpinner = null;
 
-    [SerializeField] private TextMeshProUGUI m_trackText = null;
-    [SerializeField] private TextMeshProUGUI m_albumText = null;
+    [SerializeField] private TextMeshProUGUI trackText = null;
+    [SerializeField] private TextMeshProUGUI albumText = null;
 
-    [SerializeField] private TextMeshProUGUI m_trackText1 = null;
-    [SerializeField] private TextMeshProUGUI m_albumText1 = null;
+    [SerializeField] private TextMeshProUGUI recentSongTrackText = null;
+    [SerializeField] private TextMeshProUGUI recentSongAlbumText = null;
 
-    [SerializeField] private Button m_playBtn = null;
-    [SerializeField] private Button m_pauseBtn = null;
+    [SerializeField] private Button playBtn = null;
+    [SerializeField] private Button pauseBtn = null;
 
-    [SerializeField] private Image m_albumArt = null;
-    [SerializeField] private Image m_albumArt1 = null;
+    [SerializeField] private Image albumArt = null;
+    [SerializeField] private Image recentSongAlbumArt = null;
 
-    [SerializeField] private Sprite AdvertSprite = null;
-    [SerializeField] private Button m_shuffleBtn = null;
+    [SerializeField] private Sprite advertSprite = null;
+    [SerializeField] private Button shuffleBtn = null;
 
-    [SerializeField] private Spotify4Unity.Enums.Resolution m_albumArtResolution = Spotify4Unity.Enums.Resolution.Original;
-    [SerializeField] private Color m_errorColor = new Color(1f, 0f, 0f, 0.5f);
+    [SerializeField] private Spotify4Unity.Enums.Resolution albumArtResolution = Spotify4Unity.Enums.Resolution.Original;
 
     public void OnConnect()
     {
         if (!SpotifyService.IsConnected)
         {
-            m_connectCanvas.SetActive(false);
-            m_connectingSpinner.SetActive(true);
+            connectCanvas.SetActive(false);
+            connectingSpinner.SetActive(true);
 
             bool didAttempt = SpotifyService.Connect();
             if (!didAttempt)
             {
-                m_connectCanvas.SetActive(true);
-                m_connectingSpinner.SetActive(false);
+                connectCanvas.SetActive(true);
+                connectingSpinner.SetActive(false);
             }
         }
     }
@@ -71,24 +70,21 @@ public class SpotifyController : SpotifyUIBase
     {
         base.OnConnectingChanged(e);
 
-        // Enable Connect Canvas when NOT connecting and NOT connected
-        m_connectCanvas.SetActive(!e.IsConnecting && !SpotifyService.IsConnected);
-        // Enable Spinner when connecting and NOT connected
-        m_connectingSpinner.SetActive(e.IsConnecting && !SpotifyService.IsConnected);
+        connectCanvas.SetActive(!e.IsConnecting && !SpotifyService.IsConnected);
+        connectingSpinner.SetActive(e.IsConnecting && !SpotifyService.IsConnected);
     }
 
     protected override void OnPlayStatusChanged(PlayStatusChanged e)
     {
         base.OnPlayStatusChanged(e);
 
-        // If a Play btn & Pause btn is configured, set it's correct displaying state
-        if (m_playBtn != null && m_playBtn.isActiveAndEnabled != !e.IsPlaying)
+        if (playBtn != null && playBtn.isActiveAndEnabled != !e.IsPlaying)
         {
-            m_playBtn.gameObject.SetActive(!e.IsPlaying);
+            playBtn.gameObject.SetActive(!e.IsPlaying);
         }
-        if (m_pauseBtn != null && m_pauseBtn.isActiveAndEnabled != e.IsPlaying)
+        if (pauseBtn != null && pauseBtn.isActiveAndEnabled != e.IsPlaying)
         {
-            m_pauseBtn.gameObject.SetActive(e.IsPlaying);
+            pauseBtn.gameObject.SetActive(e.IsPlaying);
         }
     }
 
@@ -96,15 +92,13 @@ public class SpotifyController : SpotifyUIBase
     {
         if (e != null)
         {
-            // Load the Album Art for the new Track
-            LoadAlbumArt(e.NewTrack, m_albumArtResolution);
+            LoadAlbumArt(e.NewTrack, albumArtResolution);
             SetTrackInfo(e.NewTrack.Title, String.Join(", ", e.NewTrack.Artists.Select(x => x.Name)), e.NewTrack.Album);
         }
     }
 
     private void LoadAlbumArt(Track t, Spotify4Unity.Enums.Resolution resolution)
     {
-        // Get the URL and load on a Coroutine
         string url = t.GetAlbumArtUrl();
         if (!string.IsNullOrEmpty(url))
         {
@@ -117,10 +111,10 @@ public class SpotifyController : SpotifyUIBase
 
     private void OnAlbumArtLoaded(Sprite s)
     {
-        if (m_albumArt != null)
+        if (albumArt != null)
         {
-            m_albumArt.sprite = s;
-            m_albumArt1.sprite = s;
+            albumArt.sprite = s;
+            recentSongAlbumArt.sprite = s;
         }
     }
 
@@ -131,12 +125,12 @@ public class SpotifyController : SpotifyUIBase
         if (state == 0)
         {
             state = (Shuffle)1;
-            m_shuffleBtn.GetComponent<Image>().color = Color.white;
+            shuffleBtn.GetComponent<Image>().color = Color.white;
         }
         else
         {
             state = (Shuffle)0;
-            m_shuffleBtn.GetComponent<Image>().color = Color.grey;
+            shuffleBtn.GetComponent<Image>().color = Color.grey;
         }
 
         await SpotifyService.SetShuffleAsync(state);
@@ -147,52 +141,26 @@ public class SpotifyController : SpotifyUIBase
     {
         if (e.MediaType == MediaType.Advert)
         {
-            if (m_albumArt != null)
-                m_albumArt.sprite = AdvertSprite;
+            if (albumArt != null)
+                albumArt.sprite = advertSprite;
 
             SetTrackInfo("Advert", "Unknown", "Unknown");
         }
     }
 
-    private void SetBtnPressedTint(ref Button btn)
-    {
-        if (btn == null)
-            return;
-        ColorBlock colors = btn.colors;
-        colors.pressedColor = m_errorColor;
-        btn.colors = colors;
-    }
-
-    protected void SetSprite(int stateIndex, Sprite[] spritesArray, Image image, string errorMsg)
-    {
-        if (stateIndex >= spritesArray.Length)
-        {
-            Analysis.LogError(errorMsg, Analysis.LogLevel.All);
-            return;
-        }
-
-        if (image != null)
-            image.sprite = spritesArray[stateIndex];
-    }
-
     private void SetTrackInfo(string track, string artist, string album)
     {
-        if (m_trackText != null)
+        if (trackText != null)
         {
-            m_trackText.text = artist + " - " + track;
-            m_trackText1.text = artist + " - " + track;
+            trackText.text = artist + " - " + track;
+            recentSongTrackText.text = artist + " - " + track;
         }
             
 
-        if (m_albumText != null)
+        if (albumText != null)
         {
-            m_albumText.text = album;
-            m_albumText1.text = album;
+            albumText.text = album;
+            recentSongAlbumText.text = album;
         }
-    }
-
-    private void OnDisconnect()
-    {
-        SpotifyService.Disconnect();
     }
 }

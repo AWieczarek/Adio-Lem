@@ -96,6 +96,7 @@ public class GameController : MonoSingleton<GameController>
                 if (player.IsOwner)
                 {
                     playerNameLabel.text = player.playerName.Value;
+                    looserMessage.text = player.looserMessage.Value;
                 }
             }
         }
