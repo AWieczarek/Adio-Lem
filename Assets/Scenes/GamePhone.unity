@@ -979,6 +979,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51ca06b0cfa9be144a54ffd4b4a062e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  looserText: {fileID: 0}
 --- !u!114 &225600989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3701,7 +3702,6 @@ MonoBehaviour:
   timerBar: {fileID: 440518152}
   maxTimeOnTimer: 5
   firstPlayerId: 0
-  table: 
   GoToNextRoundButton: {fileID: 1737106479}
   voteCounter: 0
   positiveVoteCounter: 0
@@ -3713,6 +3713,7 @@ MonoBehaviour:
   spotifyData: {fileID: 913776507}
   endButton: {fileID: 139816246}
   countDownTimer: {fileID: 1981424708}
+  looserMessage: {fileID: 115462953}
 --- !u!4 &1157566713
 Transform:
   m_ObjectHideFlags: 0

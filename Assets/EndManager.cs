@@ -8,8 +8,8 @@ using UnityEngine;
 
 public class EndManager : NetworkBehaviour
 {
-    private GameObject myPlayerListItem;
-    private TextMeshProUGUI playerNameLabel;
+    private GameObject m_myPlayerListItem;
+    private TextMeshProUGUI m_playerNameLabel;
 
     public override void NetworkStart()
     {
@@ -18,23 +18,14 @@ public class EndManager : NetworkBehaviour
             foreach (KeyValuePair<ulong, NetworkClient> nc in NetworkManager.Singleton.ConnectedClients)
             {
                 PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
-                Debug.Log(pc.playerName.Value + ": " + pc.playerPoints.Value);
-                myPlayerListItem =
+                m_myPlayerListItem =
                     Instantiate(EndController.Instance.playerListItemPrefab, Vector3.zero, Quaternion.identity);
-                myPlayerListItem.transform.SetParent(EndController.Instance.playerListContainer, false);
+                m_myPlayerListItem.transform.SetParent(EndController.Instance.playerListContainer, false);
 
-                playerNameLabel = myPlayerListItem.GetComponentInChildren<TextMeshProUGUI>();
-                playerNameLabel.text = pc.playerName.Value + ": " + pc.playerPoints.Value;
-                EndController.Instance.test = pc.playerName.Value + ": " + pc.playerPoints.Value;
-                TestClientRpc();
+                m_playerNameLabel = m_myPlayerListItem.GetComponentInChildren<TextMeshProUGUI>();
+                m_playerNameLabel.text = pc.playerName.Value + ":    " + pc.playerPoints.Value;
+                EndController.Instance.test = pc.playerName.Value + ":    " + pc.playerPoints.Value;
             }
         }
     }
-
-    [ClientRpc]
-    private void TestClientRpc()
-    {
-        Debug.Log(EndController.Instance.test);
-    }
-    
 }

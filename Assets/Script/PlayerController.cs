@@ -30,25 +30,22 @@ public class PlayerController : NetworkBehaviour
         WritePermission = NetworkVariablePermission.OwnerOnly,
         ReadPermission = NetworkVariablePermission.Everyone
     });
-    
-    public NetworkVariableString playerLoseMessage = new NetworkVariableString(new NetworkVariableSettings
-    {
-        WritePermission = NetworkVariablePermission.OwnerOnly,
-        ReadPermission = NetworkVariablePermission.Everyone
-    });
 
-    private GameObject myPlayerListItem;
-    private TextMeshProUGUI playerNameLabel;
+    private GameObject m_myPlayerListItem;
+    private TextMeshProUGUI m_playerNameLabel;
+    public String text = "Dupa";
+
+
 
     public override void NetworkStart()
     {
         RegisterEvents();
 
-        myPlayerListItem =
+        m_myPlayerListItem =
             Instantiate(LobbyController.Instance.playerListItemPrefab, Vector3.zero, Quaternion.identity);
-        myPlayerListItem.transform.SetParent(LobbyController.Instance.playerListContainer, false);
+        m_myPlayerListItem.transform.SetParent(LobbyController.Instance.playerListContainer, false);
 
-        playerNameLabel = myPlayerListItem.GetComponentInChildren<TextMeshProUGUI>();
+        m_playerNameLabel = m_myPlayerListItem.GetComponentInChildren<TextMeshProUGUI>();
 
         if (IsOwner)
         {
@@ -56,13 +53,13 @@ public class PlayerController : NetworkBehaviour
         }
         else
         {
-            playerNameLabel.text = playerName.Value;
+            m_playerNameLabel.text = playerName.Value;
         }
     }
 
     public void OnDestroy()
     {
-        Destroy(myPlayerListItem);
+        Destroy(m_myPlayerListItem);
         UnRegisterEvents();
     }
 
@@ -75,7 +72,7 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    public void AddPosints()
+    public void AddPoints()
     {
         if (NetworkManager.Singleton.LocalClientId == (ulong)GameController.Instance.firstPlayerId)
             playerPoints.Value += 300;
@@ -86,7 +83,7 @@ public class PlayerController : NetworkBehaviour
         if (IsOwner)
             playerName.Value = newName;
 
-        playerNameLabel.text = playerName.Value;
+        m_playerNameLabel.text = playerName.Value;
     }
 
     private void RegisterEvents()
@@ -103,7 +100,7 @@ public class PlayerController : NetworkBehaviour
 
     private void OnPlayerNameChange(string previousValue, string newValue)
     {
-        playerNameLabel.text = playerName.Value;
+        m_playerNameLabel.text = playerName.Value;
     }
 
     private void OnFirstPlayerChange(int previousValue, int newValue)
@@ -116,19 +113,19 @@ public class PlayerController : NetworkBehaviour
         Debug.Log("Zmieniam wartość.");
     }
 
-    public void UpdateNumber(int newNumber)
+    public void UpdateFirstPlayer(int newNumber)
     {
         firstSelected.Value = newNumber;
         if (GameController.Instance.firstPlayerId == 0)
         {
             GameController.Instance.exe.OnPauseMedia();
-
             GameController.Instance.firstPlayerNameLabel.text = newNumber.ToString();
             GameController.Instance.firstPlayerId = newNumber;
             GameController.Instance.firstPlayerNameLabel.text = playerName.Value;
             if (NetworkManager.Singleton.LocalClientId != (ulong)newNumber)
                 GameController.Instance.GoToNextRoundButton.SetActive(false);
-            TestClientRPC(newNumber);
+            GameController.Instance.looserMessage.text = "Test";
+            UpdateFirstPlayerClientRPC(newNumber);
             Invoke("OnTurnOnTimerServer", 1f);
         }
         else
@@ -140,13 +137,15 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void FailClientRPC()
     {
+        GameController.Instance.looserMessage.text = "Test";
         Debug.Log("Niestety wygrał: gracz nr: " + GameController.Instance.firstPlayerId.ToString());
     }
 
     [ClientRpc]
-    private void TestClientRPC(int newNumber)
+    private void UpdateFirstPlayerClientRPC(int newNumber)
     {
         GameController.Instance.exe.OnPauseMedia();
+        GameController.Instance.looserMessage.text = "Test";
 
         GameController.Instance.firstPlayerNameLabel.text = newNumber.ToString();
         GameController.Instance.firstPlayerId = newNumber;
@@ -167,36 +166,6 @@ public class PlayerController : NetworkBehaviour
         GameController.Instance.OnTurnOnTimerServer();
         GameController.Instance.firstPlayerNameLabel.text = "";
     }
-
-    public void OpenRecentSong()
-    {
-        if (!IsOwner)
-        {
-            return;
-        }
-
-        OpenRecentSongServerRpc();
-        GameController.Instance.OnRecentSongButton();
-    }
-
-    [ServerRpc]
-    private void OpenRecentSongServerRpc()
-    {
-        OpenRecentSongClientRpc();
-        GameController.Instance.OnRecentSongButton();
-    }
-
-    [ClientRpc]
-    private void OpenRecentSongClientRpc()
-    {
-        if (IsOwner)
-        {
-            return;
-        }
-
-        GameController.Instance.OnRecentSongButton();
-    }
-
 
     public void GoToNextRound()
     {

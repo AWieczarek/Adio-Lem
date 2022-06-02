@@ -21,7 +21,7 @@ public class GameController : MonoSingleton<GameController>
 
     public Image timerBar;
     public float maxTimeOnTimer = 5f;
-    private float timeLeft;
+    private float m_timeLeft;
 
     public int firstPlayerId;
     public GameObject GoToNextRoundButton;
@@ -46,12 +46,13 @@ public class GameController : MonoSingleton<GameController>
 
     public TMP_Text countDownTimer;
 
+    public TMP_Text looserMessage;
 
     
     private void Awake()
     {
         animator.SetTrigger("OnCountDown");
-        timeLeft = 5f;
+        m_timeLeft = 5f;
         Invoke("OnBackToGameButton", 5f);
         Invoke("OnPlayButton", 5f);
     }
@@ -148,14 +149,14 @@ public class GameController : MonoSingleton<GameController>
     public void OnTurnOnTimer()
     {
         animator.SetTrigger(OpenTimer);
-        timeLeft = maxTimeOnTimer;
+        m_timeLeft = maxTimeOnTimer;
         Invoke("OnRecentSongButton", 5f);
     }
 
     public void OnTurnOnTimerServer()
     {
         animator.SetTrigger(OpenTimer);
-        timeLeft = maxTimeOnTimer;
+        m_timeLeft = maxTimeOnTimer;
         Invoke("OnRecentSongServer", 5f);
     }
 
@@ -181,11 +182,11 @@ public class GameController : MonoSingleton<GameController>
 
     private void Update()
     {
-        if (timeLeft > 0)
+        if (m_timeLeft > 0)
         {
-            timeLeft -= Time.deltaTime;
-            timerBar.fillAmount = timeLeft / maxTimeOnTimer;
-            countDownTimer.text = Math.Round(timeLeft).ToString(CultureInfo.InvariantCulture);
+            m_timeLeft -= Time.deltaTime;
+            timerBar.fillAmount = m_timeLeft / maxTimeOnTimer;
+            countDownTimer.text = Math.Round(m_timeLeft).ToString(CultureInfo.InvariantCulture);
         }
     }
 

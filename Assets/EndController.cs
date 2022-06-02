@@ -21,7 +21,7 @@ public class EndController : MonoSingleton<EndController>
     {
         if (NetworkManager.Singleton.IsServer)
         {
-            GameObject go = Instantiate(EndController.Instance.endManagerPrefab);
+            GameObject go = Instantiate(Instance.endManagerPrefab);
             go.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
             endClientText.SetActive(false);
         }

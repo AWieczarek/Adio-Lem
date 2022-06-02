@@ -3,6 +3,7 @@ using MLAPI;
 using MLAPI.Connection;
 using MLAPI.Messaging;
 using MLAPI.Spawning;
+using TMPro;
 using UnityEngine;
 
 public class FirstPlayerGenerator : NetworkBehaviour
@@ -23,13 +24,11 @@ public class FirstPlayerGenerator : NetworkBehaviour
 
         var numberHolder = playerObject.GetComponent<PlayerController>();
 
-        Debug.Log((int)senderId);
-        numberHolder.UpdateNumber((int)senderId);
+        numberHolder.UpdateFirstPlayer((int)senderId);
 
         foreach (KeyValuePair<ulong, NetworkClient> nc in NetworkManager.Singleton.ConnectedClients)
         {
             PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
-            Debug.Log(pc.playerPoints.Value);
         }
     }
 }

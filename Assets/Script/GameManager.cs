@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GameManager : NetworkBehaviour
 {
-    private GameObject myPlayerListItem;
+    private GameObject m_myPlayerListItem;
 
     public override void NetworkStart()
     {
@@ -34,9 +34,9 @@ public class GameManager : NetworkBehaviour
         foreach (KeyValuePair<ulong, NetworkClient> nc in NetworkManager.Singleton.ConnectedClients)
         {
             PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
-            myPlayerListItem = Instantiate(GameController.Instance.playerPrefab, Vector3.zero, Quaternion.identity);
-            myPlayerListItem.name = pc.playerName.Value;
-            myPlayerListItem.GetComponent<NetworkObject>().SpawnWithOwnership(nc.Key);
+            m_myPlayerListItem = Instantiate(GameController.Instance.playerPrefab, Vector3.zero, Quaternion.identity);
+            m_myPlayerListItem.name = pc.playerName.Value;
+            m_myPlayerListItem.GetComponent<NetworkObject>().SpawnWithOwnership(nc.Key);
         }
     }
 
@@ -65,7 +65,7 @@ public class GameManager : NetworkBehaviour
         foreach (KeyValuePair<ulong, NetworkClient> nc in NetworkManager.Singleton.ConnectedClients)
         {
             PlayerController pc = nc.Value.PlayerObject.GetComponent<PlayerController>();
-            pc.AddPosints();
+            pc.AddPoints();
         }
     }
 
